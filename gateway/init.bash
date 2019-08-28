@@ -20,6 +20,7 @@ export PATH=$PATH:$HOME/.local/bin
 # The following is automagic fixing of the problem (don't do this manually):
 
 # Remove anything we might have added earlier to .bashrc
-grep -v "<DURANC>" $HOME/.bashrc > $HOME/.bashrc
+grep -v "<DURANC>" $HOME/.bashrc > $HOME/.tmp_bashrc
 # Add the path to .bashrc
-echo "export PATH=$PATH:$HOME/.local/bin # <DURANC>" >> $HOME/.bashrc
+echo "export PATH=$PATH:$HOME/.local/bin # <DURANC>" >> $HOME/.tmp_bashrc
+cp -f $HOME/.tmp_bashrc $HOME/.bashrc
