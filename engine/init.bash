@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Packages
-sudo apt-get install python3-pip ipython3 python3-numpy python3-opencv
+sudo apt-get -y install python3-pip ipython3 python3-numpy python3-opencv
 
 # For systemd daemonization to work for non-root users, do:
 sudo adduser $USER systemd-journal
