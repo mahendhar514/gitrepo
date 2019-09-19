@@ -16,11 +16,17 @@ export PATH=$PATH:$HOME/.local/bin
 
 # The following is automagic fixing of the problem (don't do this manually):
 
-# Remove anything we might have added earlier to .bashrc
-grep -v "<DURANC>" $HOME/.bashrc > $HOME/.tmp_bashrc
-# Add the path to .bashrc
-echo "export PATH=\$PATH:\$HOME/.local/bin # <DURANC>" >> $HOME/.tmp_bashrc
-cp -f $HOME/.tmp_bashrc $HOME/.bashrc
+### complement the path to have $HOME/.local/bin
+fname=$HOME"/.bashrc"
+tmp="/tmp/bashrc"
+add="export PATH=\$PATH:\$HOME/.local/bin # <DURANC>"
+# remove duranc specific stuff => tmpfile
+grep -v "<DURANC>" $fname > $tmp
+# add duranc specific stuff to tmpfile
+# comm="sed -i '2s/^/"$add"/' "$tmp
+# echo $comm
+# $comm
+echo $add | cat - $tmp > $fname
 
 ### add line "Storage=persistent" to "/etc/systemd/journald.conf"
 fname="/etc/systemd/journald.conf"
