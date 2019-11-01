@@ -41,3 +41,19 @@ sudo grep -v "<DURANC>" $fname > $tmp
 sudo echo $add" # <DURANC>" >> $tmp
 # tmpfile to final file
 sudo cp -f $tmp $fname
+
+### complement the path to have $HOME/.local/bin
+fname="/etc/sysctl.conf"
+tmp="/tmp/sysctl.conf"
+add1="net.core.wmem_max=2097152 # <DURANC>"
+add2="net.core.rmem_max=2097152 # <DURANC>"
+# remove duranc specific stuff => tmpfile
+grep -v "<DURANC>" $fname > $tmp
+# add duranc specific stuff to tmpfile
+# comm="sed -i '2s/^/"$add"/' "$tmp
+# echo $comm
+# $comm
+echo $add1 >> $tmp
+echo $add2 >> $tmp
+sudo cp -f $tmp $fname
+sudo sysctl -p
