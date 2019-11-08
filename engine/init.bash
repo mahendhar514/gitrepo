@@ -7,6 +7,9 @@ sudo apt-get -y install python3-pip ipython3 python3-numpy python3-opencv
 sudo adduser $USER systemd-journal
 sudo loginctl enable-linger $USER
 
+# disable local firewall: now other linux boxes in the LAN can access the stream via tcp
+systemctl disable ufw.service
+
 # This has given problems many times: should be in the default path, but many times, is not
 # Enable it right now
 export PATH=$PATH:$HOME/.local/bin
