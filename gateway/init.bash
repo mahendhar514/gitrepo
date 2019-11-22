@@ -10,6 +10,9 @@ sudo chmod u+s /usr/sbin/arp-scan
 sudo adduser $USER systemd-journal
 sudo loginctl enable-linger $USER
 
+# for /dev/videoX access to work, must do this:
+sudo addgroup $USER video
+
 # This has given problems many times: should be in the default path, but many times, is not
 # Enable it right now
 export PATH=$PATH:$HOME/.local/bin
