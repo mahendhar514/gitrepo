@@ -1,11 +1,7 @@
 #!/bin/bash
 
 # Packages
-sudo apt-get -y install python3-pip ipython3 python3-numpy python3-opencv redis-server qt5-default
-
-# For systemd daemonization to work for non-root users, do:
-sudo adduser $USER systemd-journal
-sudo loginctl enable-linger $USER
+sudo apt-get -y install python3-pip ipython3 python3-numpy qt5-default
 
 # disable local firewall: now other linux boxes in the LAN can access the stream via tcp
 systemctl disable ufw.service
@@ -30,14 +26,3 @@ grep -v "<DURANC>" $fname > $tmp
 # echo $comm
 # $comm
 echo $add | cat - $tmp > $fname
-
-### add line "Storage=persistent" to "/etc/systemd/journald.conf"
-fname="/etc/systemd/journald.conf"
-tmp="/tmp/journald.conf.tmp"
-add="Storage=persistent"
-# remove duranc specific stuff => tmpfile
-sudo grep -v "<DURANC>" $fname > $tmp
-# add duranc specific stuff to tmpfile
-sudo echo $add" # <DURANC>" >> $tmp
-# tmpfile to final file
-sudo cp -f $tmp $fname
