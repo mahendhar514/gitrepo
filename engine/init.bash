@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Packages
-sudo apt-get -y install python3-pip ipython3 python3-numpy python3-opencv redis-server qt5-default
+sudo apt-get -y install python3-pip ipython3 python3-numpy python3-opencv redis-server qt5-default swig
 
 # For systemd daemonization to work for non-root users, do:
 sudo adduser $USER systemd-journal
