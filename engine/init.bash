@@ -31,13 +31,28 @@ grep -v "<DURANC>" $fname > $tmp
 # $comm
 echo $add | cat - $tmp > $fname
 
+# create a directory for systemd logs that does not disappear between boots
+sudo mkdir -p /var/log/journal
+sudo systemd-tmpfiles --create --prefix /var/log/journal
+
 ### add line "Storage=persistent" to "/etc/systemd/journald.conf"
 fname="/etc/systemd/journald.conf"
 tmp="/tmp/journald.conf.tmp"
-add="Storage=persistent"
+# lines to be added
+add1="Storage=persistent # <DURANC>"
+add2="RateLimitInterval=0 # <DURANC>"
+add3="RateLimitBurst=0 # <DURANC>"
+add4="SystemMaxUse=100M # <DURANC>"
 # remove duranc specific stuff => tmpfile
 sudo grep -v "<DURANC>" $fname > $tmp
 # add duranc specific stuff to tmpfile
-sudo echo $add" # <DURANC>" >> $tmp
+sudo echo $add1 >> $tmp
+sudo echo $add2 >> $tmp
+sudo echo $add3 >> $tmp
+sudo echo $add4 >> $tmp
 # tmpfile to final file
 sudo cp -f $tmp $fname
+
+# *** restart to make the changes effective ***
+sudo systemctl restart systemd-journald
+
