@@ -64,6 +64,25 @@ fname="/etc/sysctl.conf"
 tmp="/tmp/sysctl.conf"
 add1="net.core.wmem_max=2097152 # <DURANC>"
 add2="net.core.rmem_max=2097152 # <DURANC>"
+add3="fs.file-max = 2097152 # <DURANC>"
+# remove duranc specific stuff => tmpfile
+grep -v "<DURANC>" $fname > $tmp
+# add duranc specific stuff to tmpfile
+# comm="sed -i '2s/^/"$add"/' "$tmp
+# echo $comm
+# $comm
+echo $add1 >> $tmp
+echo $add2 >> $tmp
+echo $add3 >> $tmp
+sudo cp -f $tmp $fname
+sudo sysctl -p
+
+
+### Increase ulimt openfiles
+fname="/etc/security/limits.conf"
+tmp="/tmp/limits.conf"
+add1="$USER       soft    nofile          50000 # <DURANC>"
+add2="$USER       hard    nofile          50000 # <DURANC>"
 # remove duranc specific stuff => tmpfile
 grep -v "<DURANC>" $fname > $tmp
 # add duranc specific stuff to tmpfile
@@ -73,4 +92,29 @@ grep -v "<DURANC>" $fname > $tmp
 echo $add1 >> $tmp
 echo $add2 >> $tmp
 sudo cp -f $tmp $fname
-sudo sysctl -p
+
+### Increase ulimt in user conf openfiles
+fname="/etc/systemd/user.conf"
+tmp="/tmp/user.conf"
+add1="DefaultLimitNOFILE=50000 # <DURANC>"
+# remove duranc specific stuff => tmpfile
+grep -v "<DURANC>" $fname > $tmp
+# add duranc specific stuff to tmpfile
+# comm="sed -i '2s/^/"$add"/' "$tmp
+# echo $comm
+# $comm
+echo $add1 >> $tmp
+sudo cp -f $tmp $fname
+
+### Increase ulimt in user conf openfiles
+fname="/etc/systemd/system.conf"
+tmp="/tmp/system.conf"
+add1="DefaultLimitNOFILE=50000 # <DURANC>"
+# remove duranc specific stuff => tmpfile
+grep -v "<DURANC>" $fname > $tmp
+# add duranc specific stuff to tmpfile
+# comm="sed -i '2s/^/"$add"/' "$tmp
+# echo $comm
+# $comm
+echo $add1 >> $tmp
+sudo cp -f $tmp $fname
