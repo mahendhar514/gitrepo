@@ -14,11 +14,16 @@ sudo loginctl enable-linger $USER
 sudo addgroup $USER video
 
 # Install Motion software
-wget -O - https://raw.githubusercontent.com/DurancOy/duranc_bootstrap/master/gateway/motion.conf
+wget -O motion.conf https://raw.githubusercontent.com/DurancOy/duranc_bootstrap/master/gateway/motion.conf
 mkdir ~/.motion
 mv motion.conf ~/.motion/motion.conf
 mkdir ~/.motion/feeds
 mkdir ~/.motion/images
+sudo motion -c ~/.motion/motion.conf
+echo "@reboot /usr/bin/motion -c $HOME/.motion/motion.conf" | sudo tee -a /var/spool/cron/crontabs/root >/dev/null ## Add cronjob of motion
+
+## Add Sudo permision to gwuser
+echo "$USER ALL=(ALL) NOPASSWD:ALL" | sudo tee -a /etc/sudoers >/dev/null
 
 # This has given problems many times: should be in the default path, but many times, is not
 # Enable it right now
