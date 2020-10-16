@@ -18,7 +18,7 @@ wget -O motion.conf https://raw.githubusercontent.com/DurancOy/duranc_bootstrap/
 mkdir ~/.motion
 mv motion.conf ~/.motion/motion.conf
 mkdir ~/.motion/feeds
-mkdir ~/.motion/images
+mkdir ~/.motion/event
 sudo motion -c ~/.motion/motion.conf
 echo "@reboot /usr/bin/motion -c $HOME/.motion/motion.conf" | sudo tee -a /var/spool/cron/crontabs/root >/dev/null ## Add cronjob of motion
 
