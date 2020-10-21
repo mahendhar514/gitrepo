@@ -14,10 +14,10 @@ docker volume create gw-files
 docker volume create motion-files
 
 #Download docker compose file
-wget -O $HOME/docker-compose-gateway-linux.yml https://github.com/DurancOy/duranc_bootstrap/blob/master/gateway/docker-compose-gateway-linux.yml
+wget -O $HOME/gatewayLinux.yml https://github.com/DurancOy/duranc_bootstrap/blob/master/gateway/docker-compose-gateway-linux.yml
 
 # Build docker containers
-docker-compose -f $HOME/docker-compose-gateway-linux.yml up -d
+docker-compose -f $HOME/gatewayLinux.yml up -d
 
 # Show running container
 clear
