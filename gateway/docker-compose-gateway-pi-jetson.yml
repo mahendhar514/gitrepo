@@ -1,0 +1,26 @@
+version: "3"
+services:
+  gateway:
+    image: index.docker.io/durancai/duranc_gateway_pi:latest
+    container_name: duranc_gateway
+    volumes:
+      - gateway:/root/.duranc:rw
+      - motion:/root/.motion:rw
+    network_mode: host
+    command: /usr/bin/supervisord
+  autoupdater:
+    image: containrrr/watchtower
+    container_name: duranc_autoupdater
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ~/.docker/auth.json:/config.json:ro
+    ports:
+      - 9080:8080
+    command: watchtower duranc_gateway --interval 300 --cleanup --debug
+volumes:
+  gateway:
+    external:
+      name: gw-files
+  motion:
+    external:
+      name: motion-files
