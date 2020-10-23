@@ -3,14 +3,17 @@ services:
   gateway:
     image: index.docker.io/durancai/duranc_gateway_pi:latest
     container_name: duranc_gateway
+    restart: unless-stopped
     volumes:
       - gateway:/root/.duranc:rw
       - motion:/root/.motion:rw
     network_mode: host
+    privileged: true
     command: /usr/bin/supervisord
   autoupdater:
     image: containrrr/watchtower
     container_name: duranc_autoupdater
+    restart: unless-stopped
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - ~/.docker/auth.json:/config.json:ro
