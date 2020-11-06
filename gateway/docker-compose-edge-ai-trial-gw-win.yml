@@ -22,7 +22,7 @@ services:
       - //var/run/docker.sock:/var/run/docker.sock
     ports:
       - 9080:8080
-    command: watchtower duranc_gateway --interval 300 --cleanup --debug
+    command: watchtower duranc_gateway --schedule "0 0 0 * * *" --cleanup --debug
 volumes:
   gateway:
     external:
