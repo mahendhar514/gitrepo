@@ -13,5 +13,4 @@ REM Build docker containers
 docker-compose -f C:/Users/%USERNAME%/docker-compose-gateway-windows.yml up -d
 
 REM Show running container
-cls
 docker ps -a
