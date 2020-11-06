@@ -17,7 +17,7 @@ services:
     restart: unless-stopped
     volumes:
       - //var/run/docker.sock:/var/run/docker.sock
-      - /C/Users/%USERNAME%/.docker/machine/default/auth.json:/config.json:ro
+      - /C/Users/%USERNAME%/.docker/auth.json:/config.json:ro
     ports:
       - 9080:8080
     command: watchtower duranc_gateway --interval 300 --cleanup --debug
