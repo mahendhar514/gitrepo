@@ -1,0 +1,30 @@
+version: "3"
+services:
+  gateway:
+    image: index.docker.io/durancai/edge-ai-trial-gw:latest
+    container_name: duranc_gateway
+    restart: unless-stopped
+    volumes:
+      - gateway:/root/.duranc:rw
+      - motion:/root/.motion:rw
+    ports: 
+      - 8080:8080
+    command: /usr/bin/supervisord
+
+  autoupdater:
+    image: containrrr/watchtower
+    container_name: duranc_autoupdater
+    restart: unless-stopped
+    volumes:
+      - //var/run/docker.sock:/var/run/docker.sock
+      - /C/Users/%USERNAME%/.docker/machine/default/auth.json:/config.json:ro
+    ports:
+      - 9080:8080
+    command: watchtower duranc_gateway --interval 300 --cleanup --debug
+volumes:
+  gateway:
+    external:
+      name: edge-ai-gw-files
+  motion:
+    external:
+      name: edge-ai-motion-files
