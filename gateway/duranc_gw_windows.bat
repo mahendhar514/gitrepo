@@ -1,3 +1,4 @@
+@echo off
 REM Create a link for docker config
 mklink /H C:/Users/%USERNAME%/.docker/auth.json C:/Users/%USERNAME%/.docker/config.json
 

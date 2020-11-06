@@ -15,9 +15,11 @@ services:
     image: containrrr/watchtower
     container_name: duranc_autoupdater
     restart: unless-stopped
+    environment:
+      - REPO_USER: durancinc
+      - REPO_PASS: dc202f88-e9d2-4e68-896b-95a55b08a0e3
     volumes:
       - //var/run/docker.sock:/var/run/docker.sock
-      - /C/Users/%USERNAME%/.docker/auth.json:/config.json:ro
     ports:
       - 9080:8080
     command: watchtower duranc_gateway --interval 300 --cleanup --debug
