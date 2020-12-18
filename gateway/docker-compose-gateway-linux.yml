@@ -8,6 +8,11 @@ services:
       - gateway:/root/.duranc:rw
       - motion:/root/.motion:rw
     network_mode: host
+    privileged: true
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
     command: /usr/bin/supervisord
 
   autoupdater:
@@ -21,7 +26,12 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
     ports:
       - 9080:8080
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
     command: watchtower duranc_gateway --schedule "0 0 0 * * *" --cleanup --debug
+
 volumes:
   gateway:
     external:
