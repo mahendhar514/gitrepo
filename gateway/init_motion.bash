@@ -54,18 +54,27 @@ mkdir ~/.motion/feeds
 mkdir ~/.motion/event
 sudo motion -c ~/.motion/motion.conf
 
+# check for motion.conf duplicate entry in root cron tab
 FILE_TO_CHECK="/var/spool/cron/crontabs/root"
 STRING_TO_CHECK="motion.conf"
 
 if  grep -q "$STRING_TO_CHECK" "$FILE_TO_CHECK" ; then
 	echo 'motion conf entry exists in cron tab' ;
 else
-	echo "@reboot /usr/bin/motion -c $HOME/.motion/motion.conf" | sudo tee -a /var/spool/cron/crontabs/root >/dev/null ## Add cronjob of motion
+	echo "@reboot /usr/bin/motion -c $HOME/.motion/motion.conf" | sudo tee -a /var/spool/cron/crontabs/root >/dev/null 	## Add cronjob of motion
 
 fi
 
-## Add Sudo permision to gwuser
-echo "$USER ALL=(ALL) NOPASSWD:ALL" | sudo tee -a /etc/sudoers >/dev/null
+# check for sudo permission duplicate entry in sudoers file
+FILE_TO_CHECK_1="/etc/sudoers"
+STRING_TO_CHECK_1="$USER ALL=(ALL) NOPASSWD:ALL"
+
+if  grep -q "$STRING_TO_CHECK_1" "$FILE_TO_CHECK_1" ; then
+	echo 'sudo permission entry exists in sudoers file' ;
+else
+	## Add Sudo permision to gwuser
+	echo "$USER ALL=(ALL) NOPASSWD:ALL" | sudo tee -a /etc/sudoers >/dev/null
+fi
 
 # This has given problems many times: should be in the default path, but many times, is not
 # Enable it right now
