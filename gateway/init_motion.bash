@@ -16,7 +16,6 @@ sudo addgroup $USER video
 # check for sudo permission duplicate entry in sudoers file
 FILE_TO_CHECK_1="/etc/sudoers"
 STRING_TO_CHECK_1="$USER ALL=(ALL) NOPASSWD:ALL"
-
 if  sudo grep -q "$STRING_TO_CHECK_1" "$FILE_TO_CHECK_1" ; then
 	echo 'sudo permission entry exists in sudoers file' ;
 else
@@ -68,7 +67,6 @@ sudo motion -c ~/.motion/motion.conf
 # check for motion.conf duplicate entry in root cron tab
 FILE_TO_CHECK="/var/spool/cron/crontabs/root"
 STRING_TO_CHECK="motion.conf"
-
 if  sudo grep -q "$STRING_TO_CHECK" "$FILE_TO_CHECK" ; then
 	echo 'motion conf entry exists in cron tab' ;
 else
