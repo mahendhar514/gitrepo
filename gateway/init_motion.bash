@@ -13,6 +13,17 @@ sudo loginctl enable-linger $USER
 # for /dev/videoX access to work, must do this:
 sudo addgroup $USER video
 
+# check for sudo permission duplicate entry in sudoers file
+FILE_TO_CHECK_1="/etc/sudoers"
+STRING_TO_CHECK_1="$USER ALL=(ALL) NOPASSWD:ALL"
+
+if  sudo grep -q "$STRING_TO_CHECK_1" "$FILE_TO_CHECK_1" ; then
+	echo 'sudo permission entry exists in sudoers file' ;
+else
+	## Add Sudo permision to gwuser
+	echo "$USER ALL=(ALL) NOPASSWD:ALL" | sudo tee -a /etc/sudoers >/dev/null
+fi
+
 # installation of mp4 recovery software [untrunc]
 DIRECTORY="$HOME/.recovery"
 if [ ! -d "$DIRECTORY" ]; then
@@ -58,22 +69,11 @@ sudo motion -c ~/.motion/motion.conf
 FILE_TO_CHECK="/var/spool/cron/crontabs/root"
 STRING_TO_CHECK="motion.conf"
 
-if  grep -q "$STRING_TO_CHECK" "$FILE_TO_CHECK" ; then
+if  sudo grep -q "$STRING_TO_CHECK" "$FILE_TO_CHECK" ; then
 	echo 'motion conf entry exists in cron tab' ;
 else
 	echo "@reboot /usr/bin/motion -c $HOME/.motion/motion.conf" | sudo tee -a /var/spool/cron/crontabs/root >/dev/null 	## Add cronjob of motion
 
-fi
-
-# check for sudo permission duplicate entry in sudoers file
-FILE_TO_CHECK_1="/etc/sudoers"
-STRING_TO_CHECK_1="$USER ALL=(ALL) NOPASSWD:ALL"
-
-if  grep -q "$STRING_TO_CHECK_1" "$FILE_TO_CHECK_1" ; then
-	echo 'sudo permission entry exists in sudoers file' ;
-else
-	## Add Sudo permision to gwuser
-	echo "$USER ALL=(ALL) NOPASSWD:ALL" | sudo tee -a /etc/sudoers >/dev/null
 fi
 
 # This has given problems many times: should be in the default path, but many times, is not
