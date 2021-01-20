@@ -57,12 +57,51 @@ else
 fi
 
 # Install Motion software
-wget -O motion.conf https://raw.githubusercontent.com/DurancOy/duranc_bootstrap/master/gateway/motion.conf
-mkdir ~/.motion
-mv motion.conf ~/.motion/motion.conf
-mkdir ~/.motion/feeds
-mkdir ~/.motion/event
-sudo motion -c ~/.motion/motion.conf
+mkdir -p $HOME/.motion
+wget -O $HOME/.motion/motion.conf https://raw.githubusercontent.com/DurancOy/duranc_bootstrap/master/gateway/motion.conf
+mkdir -p $HOME/.motion/feeds
+mkdir -p $HOME/.motion/event
+#sudo motion -c ~/.motion/motion.conf
+
+##SCRIPT FOR DOWNLOADING LATEST WEIGHT FILES --START ->
+# Create weights file directory
+mkdir -p $HOME/.motion/weights
+# Input file
+FILEDIRECTORY=$HOME/.motion/weights
+FILE1=latestweight.txt
+FILE2=currentweight.txt
+
+if [ -e $FILEDIRECTORY/$FILE1 ]
+then
+    echo "File Exists"
+    rm -f $FILEDIRECTORY/$FILE1
+    wget -O $HOME/.motion/weights/latestweight.txt https://raw.githubusercontent.com/DurancOy/duranc_bootstrap/master/gateway/weights/latestweight.txt
+    diff --brief <(sort $FILEDIRECTORY/$FILE1) <(sort $FILEDIRECTORY/$FILE2) >/dev/null
+	comp_value=$?
+	#Comparing two files
+	if [ $comp_value -eq 1 ]
+	then
+	    echo "Files are different - Performing Weight Files Update"
+		wget -O $HOME/.motion/weights/libdarknet.so https://raw.githubusercontent.com/DurancOy/duranc_bootstrap/master/gateway/weights/libdarknet.so
+		wget -O $HOME/.motion/weights/duranc_tiny_v3.weights https://raw.githubusercontent.com/DurancOy/duranc_bootstrap/master/gateway/weights/duranc_tiny_v3.weights
+		wget -O $HOME/.motion/weights/duranc_tiny_v3.names https://raw.githubusercontent.com/DurancOy/duranc_bootstrap/master/gateway/weights/duranc_tiny_v3.names
+		wget -O $HOME/.motion/weights/duranc_tiny_v3.cfg https://raw.githubusercontent.com/DurancOy/duranc_bootstrap/master/gateway/weights/duranc_tiny_v3.cfg
+	    # Copy latestweight.txt TO currentweight.txt
+	    cp $FILEDIRECTORY/$FILE1 $FILEDIRECTORY/$FILE2
+	else
+	    echo "No change in Files"
+	fi
+else
+	echo "You need to download $FILE1"
+	wget -O $HOME/.motion/weights/latestweight.txt https://raw.githubusercontent.com/DurancOy/duranc_bootstrap/master/gateway/weights/latestweight.txt
+	wget -O $HOME/.motion/weights/libdarknet.so https://raw.githubusercontent.com/DurancOy/duranc_bootstrap/master/gateway/weights/libdarknet.so
+	wget -O $HOME/.motion/weights/duranc_tiny_v3.weights https://raw.githubusercontent.com/DurancOy/duranc_bootstrap/master/gateway/weights/duranc_tiny_v3.weights
+	wget -O $HOME/.motion/weights/duranc_tiny_v3.names https://raw.githubusercontent.com/DurancOy/duranc_bootstrap/master/gateway/weights/duranc_tiny_v3.names
+	wget -O $HOME/.motion/weights/duranc_tiny_v3.cfg https://raw.githubusercontent.com/DurancOy/duranc_bootstrap/master/gateway/weights/duranc_tiny_v3.cfg
+	# Copy latestweight.txt TO currentweight.txt
+	cp $FILEDIRECTORY/$FILE1 $FILEDIRECTORY/$FILE2
+fi
+##SCRIPT FOR DOWNLOADING LATEST WEIGHT FILES --END <-
 
 # check for motion.conf duplicate entry in root cron tab
 FILE_TO_CHECK="/var/spool/cron/crontabs/root"
