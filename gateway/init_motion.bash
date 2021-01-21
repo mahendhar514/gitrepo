@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Packages
-sudo apt-get -y install ffmpeg python3-pip ipython3 libatlas-base-dev arp-scan libxml++2.6-dev libxslt1-dev autossh python3-numpy emacs git silversearcher-ag motion
+sudo apt-get -y install ffmpeg python3-pip ipython3 libatlas-base-dev arp-scan libxml++2.6-dev libxslt1-dev autossh python3-numpy emacs git silversearcher-ag motion libgeos-dev
     
 # In order to scan more efficiently cameras, let's allow normal user to do arp scanning:    
 sudo chmod u+s /usr/sbin/arp-scan
