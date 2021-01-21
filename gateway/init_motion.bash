@@ -58,7 +58,15 @@ fi
 
 # Install Motion software
 mkdir -p $HOME/.motion
-wget -O $HOME/.motion/motion.conf https://raw.githubusercontent.com/DurancOy/duranc_bootstrap/master/gateway/motion.conf
+hdver=`uname -m`
+
+if [ $hdver != "armv7l" ] 
+then 
+    wget -O $HOME/.motion/motion.conf https://raw.githubusercontent.com/DurancOy/duranc_bootstrap/master/gateway/motion_pi.conf
+else
+    wget -O $HOME/.motion/motion.conf https://raw.githubusercontent.com/DurancOy/duranc_bootstrap/master/gateway/motion.conf
+fi
+
 mkdir -p $HOME/.motion/feeds
 mkdir -p $HOME/.motion/event
 #sudo motion -c ~/.motion/motion.conf
