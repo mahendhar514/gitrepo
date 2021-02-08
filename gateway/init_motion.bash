@@ -24,8 +24,16 @@ else
 fi
 
 # installation of mp4 recovery software [untrunc]
-DIRECTORY="$HOME/.recovery"
-if [ ! -d "$DIRECTORY" ]; then
+FILEDIRECTORY_UNTRUNC=$HOME/.recovery/untrunc-master
+UNTRUNC_FILE=untrunc
+
+if [ ! -e $FILEDIRECTORY_UNTRUNC/$UNTRUNC_FILE ]
+then
+	DIRECTORY="$HOME/.recovery"
+	if [ -d "$DIRECTORY" ]; then
+		# Remove recovery directory
+		rm -fR $DIRECTORY
+	fi
 	# Recovery of broken mp4 clips
 	mkdir $HOME/.recovery
 	cd $HOME/.recovery
@@ -53,7 +61,7 @@ if [ ! -d "$DIRECTORY" ]; then
 	# adding to path
 	echo 'export PATH=$PATH:$HOME/.recovery/untrunc-master # <RECOVERY>' >> ~/.bashrc 
 else
-    echo 'Recovery directory exists:' $DIRECTORY
+    echo 'Untrunc Already Compiled....'
 fi
 
 # Install Motion software
