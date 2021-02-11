@@ -70,9 +70,24 @@ hdver=`uname -m`
 
 if [ $hdver != "armv7l" ] 
 then 
-    wget -O $HOME/.motion/motion.conf https://raw.githubusercontent.com/DurancOy/duranc_bootstrap/master/gateway/motion.conf
+	ping -q -c3 "www.google.com" > /dev/null
+	if [ $? -eq 0 ]
+	then
+		echo "Internet UP"
+		wget -O $HOME/.motion/motion.conf https://raw.githubusercontent.com/DurancOy/duranc_bootstrap/master/gateway/motion.conf
+	else
+		echo "Internet Down"
+	fi
 else
-    wget -O $HOME/.motion/motion.conf https://raw.githubusercontent.com/DurancOy/duranc_bootstrap/master/gateway/motion_pi.conf
+	ping -q -c3 "www.google.com" > /dev/null
+	if [ $? -eq 0 ]
+	then
+		echo "Internet UP"
+		wget -O $HOME/.motion/motion.conf https://raw.githubusercontent.com/DurancOy/duranc_bootstrap/master/gateway/motion_pi.conf
+	else
+		echo "Internet Down"
+	fi
+    
 fi
 
 mkdir -p $HOME/.motion/feeds
