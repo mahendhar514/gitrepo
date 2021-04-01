@@ -28,7 +28,7 @@ sudo cp $HOME/.supervisord/supervisord.conf /etc/supervisor/conf.d/supervisord.c
 # mkdir -p $HOME/.localstr
 # cd $HOME/.localstr
 # rm -fR *
-# git clone -b master https://53a3d943f45b99b56288448d00a6b0d387f48e22:x-oauth-basic@github.com/DurancOy/dv-gateway-streamer.git
+# git clone
 # cd $HOME/.localstr/dv-gateway-streamer
 # rm -fR node_modules package-lock.json
 # npm install
