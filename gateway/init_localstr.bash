@@ -41,9 +41,6 @@ sudo cp $HOME/.supervisord/supervisord.conf /etc/supervisor/conf.d/supervisord.c
 
 mkdir -p $HOME/.localstr
 cd $HOME/.localstr
-git clone -b master https://d7ad5bfc4ea253f60655caa392caf31d70f94628:x-oauth-basic@github.com/DurancOy/dv-gateway-streamer.git .
-rm -fR node_modules package-lock.json
-npm install
 
 
 # Changing CWD back to HOME directory
