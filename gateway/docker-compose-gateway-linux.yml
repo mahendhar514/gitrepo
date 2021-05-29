@@ -1,7 +1,7 @@
 version: "3"
 services:
   gateway:
-    image: index.docker.io/durancai/duranc_gateway:latest
+    image: index.docker.io/durancai/staging-gateway-linux:latest
     container_name: duranc_gateway
     restart: unless-stopped
     volumes:
@@ -35,7 +35,7 @@ services:
 volumes:
   gateway:
     external:
-      name: gw-files
+      name: stg-gw-files
   motion:
     external:
-      name: motion-files
+      name: stg-motion-files
