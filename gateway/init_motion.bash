@@ -23,8 +23,50 @@ else
 	echo "$USER ALL=(ALL) NOPASSWD:ALL" | sudo tee -a /etc/sudoers >/dev/null
 fi
 
-# installation of mp4 recovery software [untrunc]
-FILEDIRECTORY_UNTRUNC=$HOME/.recovery/untrunc-master
+# # installation of mp4 recovery software [untrunc]
+# FILEDIRECTORY_UNTRUNC=$HOME/.recovery/untrunc-master
+# UNTRUNC_FILE=untrunc
+
+# if [ ! -e $FILEDIRECTORY_UNTRUNC/$UNTRUNC_FILE ]
+# then
+	# DIRECTORY="$HOME/.recovery"
+	# if [ -d "$DIRECTORY" ]; then
+		# # Remove recovery directory
+		# rm -fR $DIRECTORY
+	# fi
+	# # Recovery of broken mp4 clips
+	# mkdir $HOME/.recovery
+	# cd $HOME/.recovery
+	# echo 'Recovery directory created:' $DIRECTORY
+
+	# # install packaged dependencies
+	# sudo apt-get update
+	# sudo apt-get -y install libavformat-dev libavcodec-dev libavutil-dev unzip g++ wget make nasm zlib1g-dev
+
+	# # download and extract
+	# wget -O $HOME/.recovery/master.zip https://raw.githubusercontent.com/DurancOy/duranc_bootstrap/master/gateway/untrunc/master.zip
+	# unzip master.zip
+	# cd $HOME/.recovery/untrunc-master
+	# wget -O $HOME/.recovery/untrunc-master/v12.3.zip https://raw.githubusercontent.com/DurancOy/duranc_bootstrap/master/gateway/untrunc/libav/v12.3.zip
+	# unzip $HOME/.recovery/untrunc-master/v12.3.zip
+
+	# # build libav
+	# cd $HOME/.recovery/untrunc-master/libav-12.3/
+	# ./configure && make
+
+	# # build untrunc
+	# cd $HOME/.recovery/untrunc-master
+	# /usr/bin/g++ -o untrunc -I./libav-12.3 file.cpp main.cpp track.cpp atom.cpp mp4.cpp -L./libav-12.3/libavformat -lavformat -L./libav-12.3/libavcodec -lavcodec -L./libav-12.3/libavresample -lavresample -L./libav-12.3/libavutil -lavutil -lpthread -lz
+
+	# # adding to path
+	# echo 'export PATH=$PATH:$HOME/.recovery/untrunc-master # <RECOVERY>' >> ~/.bashrc 
+# else
+    # echo 'Untrunc Already Compiled....'
+# fi
+
+
+# installation new mp4 recovery software [untrunc]
+FILEDIRECTORY_UNTRUNC=$HOME/.recovery/untrunc-new
 UNTRUNC_FILE=untrunc
 
 if [ ! -e $FILEDIRECTORY_UNTRUNC/$UNTRUNC_FILE ]
@@ -32,36 +74,27 @@ then
 	DIRECTORY="$HOME/.recovery"
 	if [ -d "$DIRECTORY" ]; then
 		# Remove recovery directory
-		rm -fR $DIRECTORY
+		rm -fR $DIRECTORY/untrunc-new
 	fi
+	
 	# Recovery of broken mp4 clips
-	mkdir $HOME/.recovery
-	cd $HOME/.recovery
+	mkdir -p $HOME/.recovery/untrunc-new
 	echo 'Recovery directory created:' $DIRECTORY
 
 	# install packaged dependencies
 	sudo apt-get update
-	sudo apt-get -y install libavformat-dev libavcodec-dev libavutil-dev unzip g++ wget make nasm zlib1g-dev
-
-	# download and extract
-	wget -O $HOME/.recovery/master.zip https://raw.githubusercontent.com/DurancOy/duranc_bootstrap/master/gateway/untrunc/master.zip
-	unzip master.zip
-	cd $HOME/.recovery/untrunc-master
-	wget -O $HOME/.recovery/untrunc-master/v12.3.zip https://raw.githubusercontent.com/DurancOy/duranc_bootstrap/master/gateway/untrunc/libav/v12.3.zip
-	unzip $HOME/.recovery/untrunc-master/v12.3.zip
-
-	# build libav
-	cd $HOME/.recovery/untrunc-master/libav-12.3/
-	./configure && make
-
-	# build untrunc
-	cd $HOME/.recovery/untrunc-master
-	/usr/bin/g++ -o untrunc -I./libav-12.3 file.cpp main.cpp track.cpp atom.cpp mp4.cpp -L./libav-12.3/libavformat -lavformat -L./libav-12.3/libavcodec -lavcodec -L./libav-12.3/libavresample -lavresample -L./libav-12.3/libavutil -lavutil -lpthread -lz
-
-	# adding to path
-	echo 'export PATH=$PATH:$HOME/.recovery/untrunc-master # <RECOVERY>' >> ~/.bashrc 
+	sudo apt-get install -y libavformat-dev libavcodec-dev libavutil-dev
+	
+	# get the source code
+	cd $HOME/.recovery/untrunc-new
+	git clone https://github.com/anthwlock/untrunc.git .
+	
+	# compile untrunc
+	cd $HOME/.recovery/untrunc-new/
+	make
+	sudo cp $HOME/.recovery/untrunc-new/untrunc /usr/local/bin 
 else
-    echo 'Untrunc Already Compiled....'
+    echo 'New Untrunc Already Compiled....'
 fi
 
 # Install Motion software
