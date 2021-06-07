@@ -13,6 +13,20 @@ else
 	echo "$USER ALL=(ALL) NOPASSWD:ALL" | sudo tee -a /etc/sudoers >/dev/null
 fi
 
+# check for swap entry in fstab
+SWPFILE_TO_CHECK="/etc/fstab"
+SWPSTRING_TO_CHECK="/mnt/6GB.swap"
+if  sudo grep -q "$SWPSTRING_TO_CHECK" "$SWPFILE_TO_CHECK" ; then
+	echo 'swap increase entry is updated' ;
+else
+	# Add 6GB of swap memory in Jetson
+	sudo fallocate -l 6G /mnt/6GB.swap
+	sudo mkswap /mnt/6GB.swap
+	sudo chmod 600 /mnt/6GB.swap
+	sudo swapon /mnt/6GB.swap
+	echo "/mnt/6GB.swap  none  swap  sw 0  0" | sudo tee -a /etc/fstab >/dev/null
+fi
+
 # Install docker compose software
 sudo apt-get install -y docker-compose gnupg2 pass
 echo "c6356d49-4f26-43f0-890c-75aceb6fc3ca" > $HOME/.pwd.txt
