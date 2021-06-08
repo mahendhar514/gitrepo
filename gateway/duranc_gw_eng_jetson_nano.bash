@@ -27,8 +27,36 @@ else
 	echo "/mnt/6GB.swap  none  swap  sw 0  0" | sudo tee -a /etc/fstab >/dev/null
 fi
 
+# check for CRON duplicate entry in root cron tab
+CRON_FILE_TO_CHECK="/var/spool/cron/crontabs/root"
+CRON_STRING_TO_CHECK="shutdown"
+if  sudo grep -q "$CRON_STRING_TO_CHECK" "$CRON_FILE_TO_CHECK" ; then
+	echo 'nightly reboot entry exists in cron tab' ;
+else
+	echo "45 23 * * * /sbin/shutdown -r now" | sudo tee -a /var/spool/cron/crontabs/root >/dev/null
+fi
+
+# Installing docker-compose
+export DOCKER_COMPOSE_VERSION=1.27.4
+sudo apt-get install -y libhdf5-dev libssl-dev
+sudo apt-get install -y python3 python3-pip
+sudo apt-get install -y libffi-dev python3-openssl
+pip3 install --upgrade pip
+pip3 install docker-compose=="${DOCKER_COMPOSE_VERSION}"
+#pip3 install docker-compose
+export PATH=$HOME/.local/bin:$PATH
+
+# check for PATH duplicate entry in root cron tab
+BASH_FILE_TO_CHECK="$HOME/.bashrc"
+BASH_STRING_TO_CHECK="$HOME/.local/bin"
+if  sudo grep -q "$BASH_STRING_TO_CHECK" "$BASH_FILE_TO_CHECK" ; then
+	echo '/local/bin entry exists in PATH' ;
+else
+	echo "export PATH=$PATH:$HOME/.local/bin # <DURANC>" | tee -a $HOME/.bashrc >/dev/null
+fi
+
 # Install docker compose software
-sudo apt-get install -y docker-compose gnupg2 pass
+#sudo apt-get install -y docker-compose gnupg2 pass
 echo "c6356d49-4f26-43f0-890c-75aceb6fc3ca" > $HOME/.pwd.txt
 cat $HOME/.pwd.txt | docker login --username durancai --password-stdin
 
