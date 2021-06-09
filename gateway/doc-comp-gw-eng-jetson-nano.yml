@@ -18,6 +18,7 @@ services:
   engine:
     image: index.docker.io/durancai/staging-engine-jetson-nano:latest
     container_name: duranc_engine
+    restart: unless-stopped
     volumes:
       - engine:/root/.duranc:rw
       - engine:/persistent:rw
