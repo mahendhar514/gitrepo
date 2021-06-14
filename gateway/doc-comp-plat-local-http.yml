@@ -1,0 +1,160 @@
+version: "3"
+services:
+  mongodb:
+    image: index.docker.io/durancai/local-http-durancdb:latest
+    container_name: duranc_db
+    ports:
+      - 27017:27017
+    restart: unless-stopped
+    volumes:
+      - db_data:/data/db
+      - data:/tmp/share
+    environment:
+        DB_IP: "18.19.0.4"
+    command: mongod
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
+    networks:
+      duranc-network:
+        ipv4_address: 18.19.0.4
+
+  portal:
+    image: index.docker.io/durancai/local-http-portal:latest
+    container_name: duranc_portal
+    depends_on:
+      - mongodb
+    ports:
+       - 80:80
+       - 3000:3000
+    restart: unless-stopped
+    command: /bin/bash -c "/tmp/start.sh.x && exec /usr/bin/supervisord"
+    volumes:
+      - portal_data:/persistent:rw
+      - data:/tmp/share:rw
+    environment:
+        PORTAL_URL: "18.18.18.130"
+        WIKI_ADMIN_EMAIL: img@duranc.com
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
+    networks:
+      duranc-network:
+        ipv4_address: 18.19.0.5
+   
+  messenger:
+    image: index.docker.io/durancai/local-http-messenger:latest
+    container_name: duranc_messenger
+    depends_on:
+      - mongodb
+      - portal
+    ports:
+        - 81:81
+        - 3001:3001
+    restart: unless-stopped
+    volumes:
+      - messenger_data:/persistent:rw
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
+    networks:
+      duranc-network:
+        ipv4_address: 18.19.0.6
+
+  streamer:
+    image: index.docker.io/durancai/local-http-streamer:latest
+    container_name: duranc_streamer
+    depends_on:
+      - mongodb
+      - portal
+      - messenger
+    ports:
+        - 82:82
+        - 3002:3002
+    restart: unless-stopped
+    volumes:
+      - streamer_data:/persistent:rw
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
+    networks:
+      duranc-network:
+        ipv4_address: 18.19.0.7
+
+  recorder:
+    image: index.docker.io/durancai/local-http-recorder:latest
+    container_name: duranc_recorder
+    depends_on:
+      - mongodb
+      - portal
+      - messenger
+      - streamer
+    restart: unless-stopped
+    volumes:
+      - recorder:/root/.duranc:rw
+      - recorder:/persistent:rw
+      - motion:/root/.motion:rw
+    ports:
+      - 8081:8080
+    command: /usr/bin/supervisord
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
+    networks:
+      duranc-network:
+        ipv4_address: 18.19.0.9
+
+  autoupdater:
+    image: containrrr/watchtower
+    container_name: duranc_autoupdater
+    depends_on:
+      - mongodb
+      - portal
+      - messenger
+      - streamer
+      - recorder
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ~/.docker/auth.json:/config.json:ro
+    ports:
+      - 9080:8080
+    command: watchtower duranc_db duranc_portal duranc_messenger duranc_streamer duranc_recorder --schedule "0 0 0 * * *" --cleanup --debug
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
+    networks:
+      duranc-network:
+        ipv4_address: 18.19.0.10
+
+volumes:
+  db_data:
+    external:
+      name: http-duranc-db
+  data:
+    external:
+      name: http-duranc-data
+  portal_data:
+    external:
+      name: http-duranc-portal
+  messenger_data:
+    external:
+      name: http-duranc-messenger
+  streamer_data:
+    external:
+      name: http-duranc-streamer
+  recorder:
+    external:
+      name: http-rec-files
+  motion:
+    external:
+      name: http-rec-motion-files
+
+networks:
+  duranc-network:
+    external: true
