@@ -28,6 +28,8 @@ services:
     ports:
        - 80:80
        - 3000:3000
+       - 3004:3004
+       - 3005:3005
     restart: unless-stopped
     command: /bin/bash -c "/tmp/start.sh.x && exec /usr/bin/supervisord"
     volumes:
