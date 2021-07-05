@@ -1,8 +1,10 @@
 #!/bin/bash
 
 # Packages
+sudo apt-get update 2> $HOME/update_error.txt
+
 sudo apt-get -y install ffmpeg python3-pip ipython3 libatlas-base-dev arp-scan libxml++2.6-dev libxslt1-dev autossh python3-numpy emacs git silversearcher-ag motion libgeos-dev python3-skimage python3-opencv python3-matplotlib unzip
-    
+
 # In order to scan more efficiently cameras, let's allow normal user to do arp scanning:    
 sudo chmod u+s /usr/sbin/arp-scan
     
@@ -180,8 +182,10 @@ fi
 # Installing PM2 for NodeJS Streamer
 FILEDIRECTORY_LOCALSTR=$HOME/.localstr
 LOCALSTR_FILE=index.js
+NOD_MOD=$HOME/.localstr/node_modules
 
-if [ ! -e $FILEDIRECTORY_LOCALSTR/$LOCALSTR_FILE ]
+#if [ ! -e $FILEDIRECTORY_LOCALSTR/$LOCALSTR_FILE ]
+if [ ! -d "$NOD_MOD" ]
 then
 	# Local Streamer Installation
 	sudo apt update
@@ -309,3 +313,13 @@ grep -v "<DURANC>" $fname > $tmp
 # $comm
 echo $add1 >> $tmp
 sudo cp -f $tmp $fname
+
+# check if apt-get update has error
+FILE_UPDATE_TO_CHECK="$HOME/update_error.txt"
+STRING_UPDATE_TO_CHECK="E:"
+if grep -q "$STRING_UPDATE_TO_CHECK" "$FILE_UPDATE_TO_CHECK"
+then
+	echo " "
+	echo "***Warning: There are errors while running apt-update... Please resolve them***"
+	echo " "
+fi
