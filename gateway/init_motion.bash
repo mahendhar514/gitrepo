@@ -15,6 +15,9 @@ sudo loginctl enable-linger $USER
 # for /dev/videoX access to work, must do this:
 sudo addgroup $USER video
 
+# Upgrade PIP
+pip3 install --upgrade pip
+
 # check for sudo permission duplicate entry in sudoers file
 FILE_TO_CHECK_1="/etc/sudoers"
 STRING_TO_CHECK_1="$USER ALL=(ALL) NOPASSWD:ALL"
