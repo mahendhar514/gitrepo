@@ -1,0 +1,72 @@
+version: "3"
+services:
+  gateway:
+    image: index.docker.io/durancai/production-gateway-jetson:latest
+    container_name: duranc_gateway
+    restart: unless-stopped
+    volumes:
+      - gateway:/root/.duranc:rw
+      - motion:/root/.motion:rw
+    network_mode: host
+    privileged: true
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
+    command: /usr/bin/supervisord
+
+  engine:
+    image: index.docker.io/durancai/production-engine-jetson-nano:latest
+    container_name: duranc_engine
+    restart: unless-stopped
+    volumes:
+      - engine:/root/.duranc:rw
+      - engine:/persistent:rw
+    network_mode: host
+    privileged: true
+    pid: host
+    runtime: nvidia
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all
+      - NVIDIA_DRIVER_CAPABILITIES=all
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
+    command: /usr/bin/supervisord
+  
+  autoupdater:
+    image: containrrr/watchtower
+    container_name: duranc_autoupdater
+    restart: unless-stopped
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ~/.docker/auth.json:/config.json:ro
+    ports:
+      - 9080:8080
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
+    command: watchtower duranc_gateway duranc_engine --schedule "0 0 0 * * *" --cleanup --debug
+
+volumes:
+  gateway:
+    driver: local
+    driver_opts:
+      o: bind
+      type: none
+      device: /local-storage/gw-files/
+  motion:
+    driver: local
+    driver_opts:
+      o: bind
+      type: none
+      device: /local-storage/motion-files/
+  engine:
+    driver: local
+    driver_opts:
+      o: bind
+      type: none
+      device: /local-storage/engine-files/
+
