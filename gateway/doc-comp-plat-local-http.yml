@@ -75,6 +75,7 @@ services:
       - messenger
     ports:
         - 82:82
+        - 1935:1935
         - 3002:3002
     restart: unless-stopped
     volumes:
