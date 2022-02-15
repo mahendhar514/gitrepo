@@ -1,0 +1,39 @@
+version: "3"
+services:
+  gateway:
+    image: index.docker.io/durancai/production-gateway-linux:latest
+    container_name: duranc_gateway
+    restart: unless-stopped
+    volumes:
+      - gateway:/root/.duranc:rw
+      - motion:/root/.motion:rw
+    network_mode: host
+    privileged: true
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
+    command: /usr/bin/supervisord
+
+  autoupdater:
+    image: containrrr/watchtower
+    container_name: duranc_autoupdater
+    restart: unless-stopped
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ~/.docker/auth.json:/config.json:ro
+    ports:
+      - 9080:8080
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
+    command: watchtower duranc_gateway --schedule "0 0 0 * * *" --cleanup --debug
+
+volumes:
+  gateway:
+    external:
+      name: stg-gw-files
+  motion:
+    external:
+      name: stg-motion-files
