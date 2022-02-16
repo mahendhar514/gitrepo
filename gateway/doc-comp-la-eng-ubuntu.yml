@@ -4,6 +4,7 @@ services:
     image: index.docker.io/durancai/staging-engine-1050ti:latest
     container_name: duranc_engine
     restart: unless-stopped
+    shm_size: "8gb"
     volumes:
       - engine:/root/.duranc:rw
       - engine:/persistent:rw
