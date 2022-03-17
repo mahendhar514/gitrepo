@@ -1,0 +1,41 @@
+version: "3"
+services:
+  gateway:
+    image: index.docker.io/durancai/production-recorder:latest
+    container_name: duranc_recorder
+    restart: unless-stopped
+    shm_size: "4gb"
+    volumes:
+      - recorder:/root/.duranc
+      - recorder:/persistent
+      - motion:/root/.motion
+    network_mode: host
+    privileged: true
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
+    command: /usr/bin/supervisord
+
+  autoupdater:
+    image: containrrr/watchtower
+    container_name: duranc_autoupdater
+    restart: unless-stopped
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ~/.docker/auth.json:/config.json:ro
+    ports:
+      - 9080:8080
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
+    command: watchtower duranc_recorder --schedule "0 0 0 * * *" --cleanup --debug
+
+volumes:
+  recorder:
+    external:
+      name: stg-rec-files
+  motion:
+    external:
+      name: stg-rec-motion-files
