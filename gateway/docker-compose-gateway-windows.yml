@@ -20,8 +20,8 @@ services:
     container_name: duranc_autoupdater
     restart: unless-stopped
     environment:
-      - REPO_USER=durancai
-      - REPO_PASS=c6356d49-4f26-43f0-890c-75aceb6fc3ca
+      - REPO_USER=durancinc
+      - REPO_PASS=2e8afdc0-884c-4446-a8ec-53642e310c09
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     ports:

@@ -2,7 +2,7 @@
 REM Create a link for docker config
 REM mklink /H C:/Users/%USERNAME%/.docker/auth.json C:/Users/%USERNAME%/.docker/config.json
 
-echo | set /p="c6356d49-4f26-43f0-890c-75aceb6fc3ca" | docker login --username durancai --password-stdin
+echo | set /p="2e8afdc0-884c-4446-a8ec-53642e310c09" | docker login --username durancinc --password-stdin
 
 REM Create docker volumes for persistent storage
 docker volume create --name=stg-gw-files
