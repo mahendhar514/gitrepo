@@ -193,7 +193,7 @@ then
 	# Local Streamer Installation
 	sudo apt update
 	sudo apt install curl -y
-	sudo apt autoremove -y
+	#sudo apt autoremove -y
 	sudo chown -R $USER:$USER /usr/lib/node_modules
 	curl -sL https://deb.nodesource.com/setup_12.x | sudo bash -
 	sudo apt install nodejs -y
