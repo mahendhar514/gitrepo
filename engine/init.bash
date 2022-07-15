@@ -1,11 +1,13 @@
 #!/bin/bash
 
 # Packages
-sudo apt-get -y install python3-pip ipython3 python3-numpy python3-opencv redis-server qt5-default swig
+sudo apt-get -y install python3-pip ipython3 python3-numpy python3-opencv redis-server qt5-default swig python3-numba 
+sudo pip3 install --user filterpy
 
 # For systemd daemonization to work for non-root users, do:
 sudo adduser $USER systemd-journal
 sudo loginctl enable-linger $USER
+sudo /lib/systemd/systemd-sysv-install disable ufw
 
 # disable local firewall: now other linux boxes in the LAN can access the stream via tcp
 systemctl disable ufw.service
@@ -55,4 +57,3 @@ sudo cp -f $tmp $fname
 
 # *** restart to make the changes effective ***
 sudo systemctl restart systemd-journald
-
