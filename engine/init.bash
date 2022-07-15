@@ -7,7 +7,6 @@ sudo pip3 install --user filterpy
 # For systemd daemonization to work for non-root users, do:
 sudo adduser $USER systemd-journal
 sudo loginctl enable-linger $USER
-sudo /lib/systemd/systemd-sysv-install disable ufw
 
 # disable local firewall: now other linux boxes in the LAN can access the stream via tcp
 systemctl disable ufw.service
