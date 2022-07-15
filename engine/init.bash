@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Packages
-sudo apt-get -y install python3-pip ipython3 python3-numpy python3-opencv redis-server qt5-default swig python3-numba 
+sudo apt-get -y install python3-pip ipython3 python3-numpy python3-opencv redis-server qt5-default swig python3-numba libopencv-dev
 sudo pip3 install --user filterpy
 
 # For systemd daemonization to work for non-root users, do:
