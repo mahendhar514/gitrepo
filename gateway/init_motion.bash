@@ -3,7 +3,25 @@
 # Packages
 sudo apt-get update 2> $HOME/update_error.txt
 
-sudo apt-get -y install ffmpeg python3-pip ipython3 libatlas-base-dev arp-scan libxml++2.6-dev libxslt1-dev autossh python3-numpy emacs git silversearcher-ag motion libgeos-dev python3-skimage python3-opencv python3-matplotlib unzip
+# Check if apt-get command is successfull or not
+if [ -s $HOME/update_error.txt ]; then
+	# The file is not-empty.
+	echo -e "\e[31mapt-get update command is NOT successfull...Please check\e[0m"
+	# check if apt-get update has error
+	FILE_UPDATE_TO_CHECK="$HOME/update_error.txt"
+	STRING_UPDATE_TO_CHECK="E:"
+	if grep -q "$STRING_UPDATE_TO_CHECK" "$FILE_UPDATE_TO_CHECK"
+	then
+		echo " "
+		echo "***Warning: There are errors while running apt-update... Please resolve them***"
+		echo " "
+	fi
+#	exit
+else
+	# The file is empty.
+	echo "apt-get update is successfull...Continue to next step"
+	sudo DEBIAN_FRONTEND=noninteractive apt-get install -y ffmpeg python3-pip ipython3 libatlas-base-dev arp-scan libxml++2.6-dev libxslt1-dev autossh python3-numpy emacs git silversearcher-ag motion libgeos-dev python3-skimage python3-opencv python3-matplotlib unzip
+fi
 
 # In order to scan more efficiently cameras, let's allow normal user to do arp scanning:    
 sudo chmod u+s /usr/sbin/arp-scan
@@ -27,48 +45,6 @@ else
 	## Add Sudo permision to gwuser
 	echo "$USER ALL=(ALL) NOPASSWD:ALL" | sudo tee -a /etc/sudoers >/dev/null
 fi
-
-# # installation of mp4 recovery software [untrunc]
-# FILEDIRECTORY_UNTRUNC=$HOME/.recovery/untrunc-master
-# UNTRUNC_FILE=untrunc
-
-# if [ ! -e $FILEDIRECTORY_UNTRUNC/$UNTRUNC_FILE ]
-# then
-	# DIRECTORY="$HOME/.recovery"
-	# if [ -d "$DIRECTORY" ]; then
-		# # Remove recovery directory
-		# rm -fR $DIRECTORY
-	# fi
-	# # Recovery of broken mp4 clips
-	# mkdir $HOME/.recovery
-	# cd $HOME/.recovery
-	# echo 'Recovery directory created:' $DIRECTORY
-
-	# # install packaged dependencies
-	# sudo apt-get update
-	# sudo apt-get -y install libavformat-dev libavcodec-dev libavutil-dev unzip g++ wget make nasm zlib1g-dev
-
-	# # download and extract
-	# wget -O $HOME/.recovery/master.zip https://raw.githubusercontent.com/DurancOy/duranc_bootstrap/master/gateway/untrunc/master.zip
-	# unzip master.zip
-	# cd $HOME/.recovery/untrunc-master
-	# wget -O $HOME/.recovery/untrunc-master/v12.3.zip https://raw.githubusercontent.com/DurancOy/duranc_bootstrap/master/gateway/untrunc/libav/v12.3.zip
-	# unzip $HOME/.recovery/untrunc-master/v12.3.zip
-
-	# # build libav
-	# cd $HOME/.recovery/untrunc-master/libav-12.3/
-	# ./configure && make
-
-	# # build untrunc
-	# cd $HOME/.recovery/untrunc-master
-	# /usr/bin/g++ -o untrunc -I./libav-12.3 file.cpp main.cpp track.cpp atom.cpp mp4.cpp -L./libav-12.3/libavformat -lavformat -L./libav-12.3/libavcodec -lavcodec -L./libav-12.3/libavresample -lavresample -L./libav-12.3/libavutil -lavutil -lpthread -lz
-
-	# # adding to path
-	# echo 'export PATH=$PATH:$HOME/.recovery/untrunc-master # <RECOVERY>' >> ~/.bashrc 
-# else
-    # echo 'Untrunc Already Compiled....'
-# fi
-
 
 # installation new mp4 recovery software [untrunc]
 FILEDIRECTORY_UNTRUNC=$HOME/.recovery/untrunc-new
@@ -104,73 +80,96 @@ fi
 
 # Install Motion software
 mkdir -p $HOME/.motion
-hdver=`uname -m`
-
-if [ $hdver != "armv7l" ] 
-then 
-	ping -q -c3 "www.google.com" > /dev/null
-	if [ $? -eq 0 ]
-	then
-		echo "Internet UP"
-		wget -O $HOME/.motion/motion.conf https://raw.githubusercontent.com/DurancOy/duranc_bootstrap/master/gateway/motion.conf
-	else
-		echo "Internet Down"
-	fi
-else
-	ping -q -c3 "www.google.com" > /dev/null
-	if [ $? -eq 0 ]
-	then
-		echo "Internet UP"
-		wget -O $HOME/.motion/motion.conf https://raw.githubusercontent.com/DurancOy/duranc_bootstrap/master/gateway/motion_pi.conf
-	else
-		echo "Internet Down"
-	fi
-    
-fi
-
 mkdir -p $HOME/.motion/feeds
 mkdir -p $HOME/.motion/event
-#sudo motion -c ~/.motion/motion.conf
 
-##SCRIPT FOR DOWNLOADING LATEST WEIGHT FILES --START ->
-# Create weights file directory
-mkdir -p $HOME/.motion/weights
-# Input file
-FILEDIRECTORY=$HOME/.motion/weights
-FILE1=latestweight.txt
-FILE2=currentweight.txt
-
-if [ -e $FILEDIRECTORY/$FILE1 ]
+# Check hardware version for Raspberry Pi
+hdver=`uname -m`
+if [ $hdver != "armv7l" ] 
 then
-    echo "File Exists"
-    rm -f $FILEDIRECTORY/$FILE1
-    wget -O $HOME/.motion/weights/latestweight.txt https://raw.githubusercontent.com/DurancOy/duranc_bootstrap/master/gateway/weights/latestweight.txt
-    diff --brief <(sort $FILEDIRECTORY/$FILE1) <(sort $FILEDIRECTORY/$FILE2) >/dev/null
-	comp_value=$?
-	#Comparing two files
-	if [ $comp_value -eq 1 ]
+	echo "This is regular machine..."
+	# Perform below steps only if internet is working
+	ping -q -c3 "www.google.com" > /dev/null
+	if [ $? -eq 0 ]
 	then
-	    echo "Files are different - Performing Weight Files Update"
-		wget -O $HOME/.motion/weights/libdarknet.so https://raw.githubusercontent.com/DurancOy/duranc_bootstrap/master/gateway/weights/libdarknet.so
-		wget -O $HOME/.motion/weights/duranc_tiny_v3.weights https://raw.githubusercontent.com/DurancOy/duranc_bootstrap/master/gateway/weights/duranc_tiny_v3.weights
-		wget -O $HOME/.motion/weights/duranc_tiny_v3.names https://raw.githubusercontent.com/DurancOy/duranc_bootstrap/master/gateway/weights/duranc_tiny_v3.names
-		wget -O $HOME/.motion/weights/duranc_tiny_v3.cfg https://raw.githubusercontent.com/DurancOy/duranc_bootstrap/master/gateway/weights/duranc_tiny_v3.cfg
-	    # Copy latestweight.txt TO currentweight.txt
-	    cp $FILEDIRECTORY/$FILE1 $FILEDIRECTORY/$FILE2
+		echo "Internet UP"
+		mv $HOME/.motion/motion.conf $HOME/.motion/motion-orig.conf
+		wget -O $HOME/.motion/motion.conf https://raw.githubusercontent.com/DurancOy/duranc_bootstrap/master/gateway/motion-latest.conf
+
+		# CHECK IF MOTION.CONF FILE IS EMPTY OR NOT
+		if [ -s $HOME/.motion/motion.conf ]; then
+			# The file is not-empty.
+			echo -e "\e[31mMotion configuration downloaded successfully\e[0m"
+			rm -f $HOME/.motion/motion-orig.conf
+		else
+			# The file is empty.
+			mv $HOME/.motion/motion-orig.conf $HOME/.motion/motion.conf
+		fi
+
+		##SCRIPT FOR DOWNLOADING LATEST WEIGHT FILES --START ->
+		# Input file
+		FILEDIRECTORY=$HOME/.motion/weights
+		FILE1=latestweight.txt
+		FILE2=currentweight.txt
+
+		if [ -e $FILEDIRECTORY/$FILE1 ]
+		then
+			echo "File Exists"
+			rm -f $FILEDIRECTORY/$FILE1
+			wget -O $HOME/.motion/weights/latestweight.txt https://raw.githubusercontent.com/DurancOy/duranc_bootstrap/master/gateway/weights/latestweight.txt
+			diff --brief <(sort $FILEDIRECTORY/$FILE1) <(sort $FILEDIRECTORY/$FILE2) >/dev/null
+			comp_value=$?
+			#Comparing two files
+			if [ $comp_value -eq 1 ]
+			then
+				echo "Files are different - Performing Weight Files Update"
+				wget -O $HOME/.motion/weights/libdarknet.so https://raw.githubusercontent.com/DurancOy/duranc_bootstrap/master/gateway/weights/libdarknet.so
+				wget -O $HOME/.motion/weights/duranc_tiny_v3.weights https://raw.githubusercontent.com/DurancOy/duranc_bootstrap/master/gateway/weights/duranc_tiny_v3.weights
+				wget -O $HOME/.motion/weights/duranc_tiny_v3.names https://raw.githubusercontent.com/DurancOy/duranc_bootstrap/master/gateway/weights/duranc_tiny_v3.names
+				wget -O $HOME/.motion/weights/duranc_tiny_v3.cfg https://raw.githubusercontent.com/DurancOy/duranc_bootstrap/master/gateway/weights/duranc_tiny_v3.cfg
+				# Copy latestweight.txt TO currentweight.txt
+				cp $FILEDIRECTORY/$FILE1 $FILEDIRECTORY/$FILE2
+			else
+				echo "No change in Files"
+			fi
+		else
+			# Fresh Installation, create weights file directory
+			mkdir -p $HOME/.motion/weights
+			echo "You need to download $FILE1"
+			wget -O $HOME/.motion/weights/latestweight.txt https://raw.githubusercontent.com/DurancOy/duranc_bootstrap/master/gateway/weights/latestweight.txt
+			wget -O $HOME/.motion/weights/libdarknet.so https://raw.githubusercontent.com/DurancOy/duranc_bootstrap/master/gateway/weights/libdarknet.so
+			wget -O $HOME/.motion/weights/duranc_tiny_v3.weights https://raw.githubusercontent.com/DurancOy/duranc_bootstrap/master/gateway/weights/duranc_tiny_v3.weights
+			wget -O $HOME/.motion/weights/duranc_tiny_v3.names https://raw.githubusercontent.com/DurancOy/duranc_bootstrap/master/gateway/weights/duranc_tiny_v3.names
+			wget -O $HOME/.motion/weights/duranc_tiny_v3.cfg https://raw.githubusercontent.com/DurancOy/duranc_bootstrap/master/gateway/weights/duranc_tiny_v3.cfg
+			# Copy latestweight.txt TO currentweight.txt
+			cp $FILEDIRECTORY/$FILE1 $FILEDIRECTORY/$FILE2
+		fi
+		##SCRIPT FOR DOWNLOADING LATEST WEIGHT FILES --END <-
 	else
-	    echo "No change in Files"
+		echo "Internet Down"
 	fi
 else
-	echo "You need to download $FILE1"
-	wget -O $HOME/.motion/weights/latestweight.txt https://raw.githubusercontent.com/DurancOy/duranc_bootstrap/master/gateway/weights/latestweight.txt
-	wget -O $HOME/.motion/weights/libdarknet.so https://raw.githubusercontent.com/DurancOy/duranc_bootstrap/master/gateway/weights/libdarknet.so
-	wget -O $HOME/.motion/weights/duranc_tiny_v3.weights https://raw.githubusercontent.com/DurancOy/duranc_bootstrap/master/gateway/weights/duranc_tiny_v3.weights
-	wget -O $HOME/.motion/weights/duranc_tiny_v3.names https://raw.githubusercontent.com/DurancOy/duranc_bootstrap/master/gateway/weights/duranc_tiny_v3.names
-	wget -O $HOME/.motion/weights/duranc_tiny_v3.cfg https://raw.githubusercontent.com/DurancOy/duranc_bootstrap/master/gateway/weights/duranc_tiny_v3.cfg
-	# Copy latestweight.txt TO currentweight.txt
-	cp $FILEDIRECTORY/$FILE1 $FILEDIRECTORY/$FILE2
+	echo "This is Raspberry Pi..."
+	# Perform below steps only if internet is working
+	ping -q -c3 "www.google.com" > /dev/null
+	if [ $? -eq 0 ]
+	then
+		echo "Internet UP"
+		mv $HOME/.motion/motion.conf $HOME/.motion/motion-orig.conf
+		wget -O $HOME/.motion/motion.conf https://raw.githubusercontent.com/DurancOy/duranc_bootstrap/master/gateway/motion_pi.conf
+		# CHECK IF MOTION.CONF FILE IS EMPTY OR NOT
+		if [ -s $HOME/.motion/motion.conf ]; then
+			# The file is not-empty.
+			echo -e "\e[31mMotion configuration downloaded successfully\e[0m"
+			rm -f $HOME/.motion/motion-orig.conf
+		else
+			# The file is empty.
+			mv $HOME/.motion/motion-orig.conf $HOME/.motion/motion.conf
+		fi
+	else
+		echo "Internet Down"
+	fi
 fi
-##SCRIPT FOR DOWNLOADING LATEST WEIGHT FILES --END <-
 
 # check for motion.conf duplicate entry in root cron tab
 FILE_TO_CHECK="/var/spool/cron/crontabs/root"
@@ -317,12 +316,3 @@ grep -v "<DURANC>" $fname > $tmp
 echo $add1 >> $tmp
 sudo cp -f $tmp $fname
 
-# check if apt-get update has error
-FILE_UPDATE_TO_CHECK="$HOME/update_error.txt"
-STRING_UPDATE_TO_CHECK="E:"
-if grep -q "$STRING_UPDATE_TO_CHECK" "$FILE_UPDATE_TO_CHECK"
-then
-	echo " "
-	echo "***Warning: There are errors while running apt-update... Please resolve them***"
-	echo " "
-fi
