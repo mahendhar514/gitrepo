@@ -1,0 +1,42 @@
+version: "3"
+services:
+  engine:
+    image: index.docker.io/durancai/production-engine-cloud-3080:latest
+    container_name: duranc_engine
+    restart: unless-stopped
+    shm_size: "8gb"
+    volumes:
+      - engine:/root/.duranc:rw
+      - engine:/persistent:rw
+    network_mode: host
+    privileged: true
+    pid: host
+    runtime: nvidia
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all
+      - NVIDIA_DRIVER_CAPABILITIES=all
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
+    command: /usr/bin/supervisord
+  
+  autoupdater:
+    image: containrrr/watchtower
+    container_name: duranc_autoupdater
+    restart: unless-stopped
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ~/.docker/auth.json:/config.json:ro
+    ports:
+      - 9080:8080
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
+    command: watchtower duranc_engine --schedule "0 0 0 * * *" --cleanup --debug
+
+volumes:
+  engine:
+    external:
+      name: stg-engine-files
