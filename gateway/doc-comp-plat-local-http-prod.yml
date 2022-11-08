@@ -121,6 +121,7 @@ services:
       - messenger
       - streamer
       - recorder
+    restart: always
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - ~/.docker/auth.json:/config.json:ro
