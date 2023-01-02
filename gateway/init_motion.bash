@@ -1,6 +1,7 @@
 #!/bin/bash
 
 # Packages
+echo "Updating OS Packages..."
 sudo apt-get update 2> $HOME/update_error.txt
 
 # Check if apt-get command is successfull or not
