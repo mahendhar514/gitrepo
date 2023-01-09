@@ -95,7 +95,15 @@ then
 	then
 		echo "Internet UP"
 		mv $HOME/.motion/motion.conf $HOME/.motion/motion-orig.conf
-		wget -O $HOME/.motion/motion.conf https://raw.githubusercontent.com/DurancOy/duranc_bootstrap/master/gateway/motion-latest.conf
+		#wget -O $HOME/.motion/motion.conf https://raw.githubusercontent.com/DurancOy/duranc_bootstrap/master/gateway/motion-latest.conf
+		motion_version=`/usr/bin/dpkg -s motion | grep Version`
+		echo "motion-version: " $motion_version
+		if [[ "$motion_version" == *"4.0"* ]]
+		then
+			wget -O $HOME/.motion/motion.conf https://raw.githubusercontent.com/DurancOy/duranc_bootstrap/master/gateway/motion.conf
+		else
+			wget -O $HOME/.motion/motion.conf https://raw.githubusercontent.com/DurancOy/duranc_bootstrap/master/gateway/motion-latest.conf
+		fi
 
 		# CHECK IF MOTION.CONF FILE IS EMPTY OR NOT
 		if [ -s $HOME/.motion/motion.conf ]; then
