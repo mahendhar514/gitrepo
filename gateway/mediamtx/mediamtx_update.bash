@@ -7,6 +7,7 @@ case "$ARCH" in
 esac
 
 BASE_PATH="$HOME/.localrtsp/"
+mkdir $HOME/.localrtsp/
 BINARY_PATH="$BASE_PATH"mediamtx
 CONFIG_PATH="$BASE_PATH"mediamtx.yml
 LICENSE_PATH="$BASE_PATH"LICENSE
