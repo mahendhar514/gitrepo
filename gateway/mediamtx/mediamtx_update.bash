@@ -7,14 +7,14 @@ case "$ARCH" in
 esac
 
 BASE_PATH="$HOME/.localrtsp/"
-mkdir $HOME/.localrtsp/
+mkdir -p $BASE_PATH
 BINARY_PATH="$BASE_PATH"mediamtx
 CONFIG_PATH="$BASE_PATH"mediamtx.yml
 LICENSE_PATH="$BASE_PATH"LICENSE
 URL_BASE="https://raw.githubusercontent.com/DurancOy/duranc_bootstrap/master/gateway/mediamtx/"
 MD5_BINARY_URL="$URL_BASE"mediamtx_"$ARCH"_md5
-MD5_CONFIG_URL="$URL_BASE"mediamtx_config_md5
 DOWNLOAD_BINARY_URL="$URL_BASE"mediamtx_"$ARCH"
+CONFIG_VERSION_URL="$URL_BASE"CONF_VERSION
 DOWNLOAD_CONF_URL="$URL_BASE"mediamtx.yml
 LICENSE_URL="$URL_BASE"LICENSE
 
@@ -31,19 +31,20 @@ else
     chmod +x "$BINARY_PATH"
 fi
 
-CURRENT_CONFIG_MD5=""
-REMOTE_CONFIG_MD5="$(curl -s "$MD5_CONFIG_URL")"
+CURRENT_CONFIG_VERSION="0.0.0"
+REMOTE_CONFIG_VERSION="$(curl -s "$CONFIG_VERSION_URL")"
 if [ -f "$CONFIG_PATH" ]; then
-    CURRENT_CONFIG_MD5="$(md5sum "$CONFIG_PATH" | awk '{ print $1 }')"
+    CURRENT_CONFIG_VERSION="$(sed -n '1p' $CONFIG_PATH | cut -d'=' -f2)"
 fi
-if [ "$CURRENT_CONFIG_MD5" == "$REMOTE_CONFIG_MD5" ]; then
-    echo "Mediamtx configuration file is up to date"
-else
+if [ "$CURRENT_CONFIG_VERSION" != "$REMOTE_CONFIG_VERSION" ]; then
     echo "Updating mediamtx configuration file..."
     curl -s "$DOWNLOAD_CONF_URL" -o "$CONFIG_PATH"
     PASSWORD=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 10 | head -n 1)
     sed -i "s/apiuser: PASSWORD_PLACEHOLDER/apiuser: $PASSWORD/g" $CONFIG_PATH
+else
+    echo "Mediamtx configuration file is up to date"
 fi
+
 echo "Updating mediamtx license file..."
 curl -s "$LICENSE_URL" -o "$LICENSE_PATH"
 echo "Mediamtx install end."

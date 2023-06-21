@@ -1,5 +1,7 @@
+#CONF_VERSION=0.0.1
 readBufferCount: 4096
 api: yes
+apiAddress: 127.0.0.1:9997
 apiBasicAuthCredentials:
   apiuser: PASSWORD_PLACEHOLDER
 rtspDisable: no
