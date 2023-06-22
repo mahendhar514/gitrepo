@@ -27,6 +27,7 @@ services:
       - mongodb
     ports:
        - 80:80
+       - 83:83
        - 3000:3000
        - 3004:3004
        - 3005:3005
@@ -34,6 +35,7 @@ services:
     command: /bin/bash -c "/tmp/start.sh.x && exec /usr/bin/supervisord"
     volumes:
       - portal_data:/persistent:rw
+      - portal_storage:/local_storage:rw
       - data:/tmp/share:rw
     environment:
         PORTAL_URL
@@ -101,16 +103,18 @@ services:
       - recorder:/root/.duranc:rw
       - recorder:/persistent:rw
       - motion:/root/.motion:rw
-    ports:
-      - 8081:8080
+    network_mode: host
+    privileged: true
+    # ports:
+      # - 8081:8080
     command: /usr/bin/supervisord
     logging:
       options:
         max-size: "10m"
         max-file: "3"
-    networks:
-      duranc-network:
-        ipv4_address: 18.19.0.9
+    # networks:
+      # duranc-network:
+        # ipv4_address: 18.19.0.9
 
   autoupdater:
     image: containrrr/watchtower
@@ -146,6 +150,9 @@ volumes:
   portal_data:
     external:
       name: http-duranc-portal
+  portal_storage:
+    external:
+      name: http-duranc-storage
   messenger_data:
     external:
       name: http-duranc-messenger
