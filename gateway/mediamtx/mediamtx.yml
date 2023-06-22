@@ -13,4 +13,5 @@ authMethods: [basic]
 rtmpDisable: yes
 hlsVariant: mpegts
 webrtcDisable: yes
+hlsDisable: yes
 
