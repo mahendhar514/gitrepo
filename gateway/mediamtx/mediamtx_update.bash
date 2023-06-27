@@ -31,13 +31,16 @@ else
     chmod +x "$BINARY_PATH"
 fi
 
-CURRENT_CONFIG_VERSION="0.0.0"
+CURRENT_CONFIG_VERSION="0"
 REMOTE_CONFIG_VERSION="$(curl -s "$CONFIG_VERSION_URL")"
 if [ -f "$CONFIG_PATH" ]; then
     CURRENT_CONFIG_VERSION="$(sed -n '1p' $CONFIG_PATH | cut -d'=' -f2)"
 fi
-if [ "$CURRENT_CONFIG_VERSION" != "$REMOTE_CONFIG_VERSION" ]; then
-    echo "Updating mediamtx configuration file..."
+if [[ $CURRENT_CONFIG_VERSION =~ [^0-9]+ ]]; then
+    CURRENT_CONFIG_VERSION="0"
+fi
+if [ $REMOTE_CONFIG_VERSION -gt $CURRENT_CONFIG_VERSION ]; then
+    echo "Updating mediamtx configuration file... from "$CURRENT_CONFIG_VERSION" to  "$REMOTE_CONFIG_VERSION
     curl -s "$DOWNLOAD_CONF_URL" -o "$CONFIG_PATH"
     PASSWORD=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 10 | head -n 1)
     sed -i "s/apiuser: PASSWORD_PLACEHOLDER/apiuser: $PASSWORD/g" $CONFIG_PATH

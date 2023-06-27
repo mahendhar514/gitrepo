@@ -1,4 +1,4 @@
-#CONF_VERSION=0.0.2
+#CONF_VERSION=003
 readBufferCount: 4096
 api: yes
 apiAddress: 127.0.0.1:9997
