@@ -85,7 +85,6 @@ else
 fi
 
 # Install Motion software
-
 mkdir -p $HOME/.motion
 mkdir -p $HOME/.motion/feeds
 mkdir -p $HOME/.motion/event
