@@ -23,7 +23,7 @@ if [ -s $HOME/update_error.txt ]; then
 else
 	# The file is empty.
 	echo "apt-get update is successfull...Continue to next step"
-	sudo DEBIAN_FRONTEND=noninteractive apt-get install -y ffmpeg python3-pip ipython3 libatlas-base-dev arp-scan libxml++2.6-dev libxslt1-dev autossh python3-numpy emacs git silversearcher-ag motion libgeos-dev python3-skimage python3-opencv python3-matplotlib unzip
+	sudo DEBIAN_FRONTEND=noninteractive apt-get install -y dpkg ffmpeg python3-pip ipython3 libatlas-base-dev arp-scan libxml++2.6-dev libxslt1-dev autossh python3-numpy emacs git silversearcher-ag libgeos-dev python3-skimage python3-opencv python3-matplotlib unzip
 
 	# Install VLC player
 	sudo DEBIAN_FRONTEND=noninteractive apt-get install -y vlc
@@ -85,6 +85,7 @@ else
 fi
 
 # Install Motion software
+
 mkdir -p $HOME/.motion
 mkdir -p $HOME/.motion/feeds
 mkdir -p $HOME/.motion/event
@@ -99,17 +100,30 @@ then
 	if [ $? -eq 0 ]
 	then
 		echo "Internet UP"
-		mv $HOME/.motion/motion.conf $HOME/.motion/motion-orig.conf
-		#wget -O $HOME/.motion/motion.conf https://raw.githubusercontent.com/DurancOy/duranc_bootstrap/master/gateway/motion-latest.conf
-		motion_version=`/usr/bin/dpkg -s motion | grep Version`
-		echo "motion-version: " $motion_version
-		if [[ "$motion_version" == *"4.0"* ]]
-		then
-			wget -O $HOME/.motion/motion.conf https://raw.githubusercontent.com/DurancOy/duranc_bootstrap/master/gateway/motion.conf
+		ubuntu_codename=$(lsb_release -cs)
+		motion_git_release_url="https://github.com/Motion-Project/motion/releases/download/release-4.5.1"
+		package_name="${ubuntu_codename}_motion_4.5.1-1_amd64.deb"
+		if wget --spider "$motion_git_release_url/$package_name" 2>/dev/null; then
+			wget -O $package_name "$motion_git_release_url/$package_name"
+			sudo apt-get purge motion
+			sudo dpkg -i $package_name
+			sudo apt-get install -f
 		else
-			wget -O $HOME/.motion/motion.conf https://raw.githubusercontent.com/DurancOy/duranc_bootstrap/master/gateway/motion-latest.conf
+			echo "Couldnt download motion for Ubuntu $ubuntu_codename."
 		fi
-
+		mv $HOME/.motion/motion.conf $HOME/.motion/motion-orig.conf
+		motion_version=$(/usr/bin/dpkg -s motion | grep Version | grep -oP "Version: \K[0-9.]+")
+		echo "motion-version: " $motion_version
+		# Check version
+		if [[ $motion_version == 4.0.* ]]; then
+			wget -O $HOME/.motion/motion.conf https://raw.githubusercontent.com/DurancOy/duranc_bootstrap/master/gateway/motion-4.0.conf
+		elif [[ $motion_version == 4.2.* ]]; then
+			wget -O $HOME/.motion/motion.conf https://raw.githubusercontent.com/DurancOy/duranc_bootstrap/master/gateway/motion-4.2.conf
+		elif [[ $motion_version == 4.5.1* ]]; then
+			wget -O $HOME/.motion/motion.conf https://raw.githubusercontent.com/DurancOy/duranc_bootstrap/master/gateway/motion-4.5.1.conf
+		else
+			echo "Version is outside the specified range or not recognized."
+		fi
 		# CHECK IF MOTION.CONF FILE IS EMPTY OR NOT
 		if [ -s $HOME/.motion/motion.conf ]; then
 			# The file is not-empty.
