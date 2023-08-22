@@ -99,16 +99,20 @@ then
 	if [ $? -eq 0 ]
 	then
 		echo "Internet UP"
-		ubuntu_codename=$(lsb_release -cs)
-		motion_git_release_url="https://github.com/Motion-Project/motion/releases/download/release-4.5.1"
-		package_name="${ubuntu_codename}_motion_4.5.1-1_amd64.deb"
-		if wget --spider "$motion_git_release_url/$package_name" 2>/dev/null; then
-			wget -O $package_name "$motion_git_release_url/$package_name"
-			sudo apt-get purge motion
-			sudo dpkg -i $package_name
-			sudo apt-get install -f
-		else
-			echo "Couldnt download motion for Ubuntu $ubuntu_codename."
+		motion_version=$(/usr/bin/dpkg -s motion | grep Version | grep -oP "Version: \K[0-9.]+")
+		if [[ $motion_version != 4.5.1* ]]; then
+			ubuntu_codename=$(lsb_release -cs)
+			motion_git_release_url="https://github.com/Motion-Project/motion/releases/download/release-4.5.1"
+			architecture=$(dpkg --print-architecture)
+			package_name="${ubuntu_codename}_motion_4.5.1-1_${architecture}.deb"
+			if wget --spider "$motion_git_release_url/$package_name" 2>/dev/null; then
+				wget -O $package_name "$motion_git_release_url/$package_name"
+				sudo apt-get purge motion
+				sudo dpkg -i $package_name
+				sudo apt-get install -f
+			else
+				echo "Couldnt download motion for Ubuntu $ubuntu_codename."
+			fi
 		fi
 		mv $HOME/.motion/motion.conf $HOME/.motion/motion-orig.conf
 		motion_version=$(/usr/bin/dpkg -s motion | grep Version | grep -oP "Version: \K[0-9.]+")
