@@ -23,7 +23,7 @@ if [ -s $HOME/update_error.txt ]; then
 else
 	# The file is empty.
 	echo "apt-get update is successfull...Continue to next step"
-	sudo DEBIAN_FRONTEND=noninteractive apt-get install -y dpkg ffmpeg python3-pip ipython3 libatlas-base-dev arp-scan libxml++2.6-dev libxslt1-dev autossh python3-numpy emacs git silversearcher-ag libgeos-dev python3-skimage python3-opencv python3-matplotlib unzip portaudio19-dev python3-pyaudio
+	sudo DEBIAN_FRONTEND=noninteractive apt-get install -y dpkg ffmpeg python3-pip ipython3 libatlas-base-dev arp-scan libxml++2.6-dev libxslt1-dev autossh python3-numpy emacs git silversearcher-ag libgeos-dev python3-skimage python3-opencv python3-matplotlib unzip portaudio19-dev python3-pyaudio python3-websocket
 	# Install VLC player
 	sudo DEBIAN_FRONTEND=noninteractive apt-get install -y vlc
 fi
