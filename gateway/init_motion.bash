@@ -347,3 +347,16 @@ grep -v "<DURANC>" $fname > $tmp
 echo $add1 >> $tmp
 sudo cp -f $tmp $fname
 
+
+sudo mkdir -p /.scripts
+sudo chmod 777 -R /.scripts
+SCRIPT=/.scripts/service_ensure_running.sh
+CRON_STRING_TO_CHECK="service_ensure_running"
+CRON_FILE="/var/spool/cron/crontabs/root"
+wget -O $SCRIPT https://raw.githubusercontent.com/DurancOy/duranc_bootstrap/master/gateway/service_ensure_running.sh &> /dev/null
+sudo chmod 777 -R /.scripts
+if  sudo grep -q "$CRON_STRING_TO_CHECK" "$CRON_FILE" ; then
+	echo 'docker container status entry exists in cron tab' ;
+else
+	echo "0 * * * * sudo -u $USER $SCRIPT" | sudo tee -a $CRON_FILE >/dev/null
+fi
