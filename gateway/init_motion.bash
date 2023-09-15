@@ -358,5 +358,5 @@ sudo chmod 777 -R /.scripts
 if  sudo grep -q "$CRON_STRING_TO_CHECK" "$CRON_FILE" ; then
 	echo 'docker container status entry exists in cron tab' ;
 else
-	echo "0 * * * * sudo -u $USER $SCRIPT" | sudo tee -a $CRON_FILE >/dev/null
+	echo "*/15 * * * * sudo -u $USER $SCRIPT" | sudo tee -a $CRON_FILE >/dev/null
 fi
