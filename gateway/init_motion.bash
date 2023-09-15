@@ -1,6 +1,6 @@
 #!/bin/bash
 date=`date`
-
+HOSTED_ROOT=https://portal.duranc.com/bootstrap/
 # Packages
 echo "Updating OS Packages..."
 sudo apt-get update 2> $HOME/update_error.txt
@@ -118,11 +118,11 @@ then
 		echo "motion-version: " $motion_version
 		# Check version
 		if [[ $motion_version == 4.0.* ]]; then
-			wget -O $HOME/.motion/motion.conf https://raw.githubusercontent.com/DurancOy/duranc_bootstrap/master/gateway/motion-4.0.conf
+			wget -O $HOME/.motion/motion.conf $HOSTED_ROOT/gateway/motion-4.0.conf
 		elif [[ $motion_version == 4.2.* ]]; then
-			wget -O $HOME/.motion/motion.conf https://raw.githubusercontent.com/DurancOy/duranc_bootstrap/master/gateway/motion-4.2.conf
+			wget -O $HOME/.motion/motion.conf $HOSTED_ROOT/gateway/motion-4.2.conf
 		elif [[ $motion_version == 4.5.1* ]]; then
-			wget -O $HOME/.motion/motion.conf https://raw.githubusercontent.com/DurancOy/duranc_bootstrap/master/gateway/motion-4.5.1.conf
+			wget -O $HOME/.motion/motion.conf $HOSTED_ROOT/gateway/motion-4.5.1.conf
 		else
 			echo "Version is outside the specified range or not recognized."
 		fi
@@ -146,19 +146,45 @@ then
 		then
 			echo "File Exists"
 			rm -f $FILEDIRECTORY/$FILE1
-			wget -O $HOME/.motion/weights/latestweight.txt https://raw.githubusercontent.com/DurancOy/duranc_bootstrap/master/gateway/weights/latestweight.txt
+			wget -O $HOME/.motion/weights/latestweight.txt $HOSTED_ROOT/gateway/weights/latestweight.txt
 			diff --brief <(sort $FILEDIRECTORY/$FILE1) <(sort $FILEDIRECTORY/$FILE2) >/dev/null
 			comp_value=$?
 			#Comparing two files
 			if [ $comp_value -eq 1 ]
 			then
-				echo "Files are different - Performing Weight Files Update"
-				wget -O $HOME/.motion/weights/libdarknet.so https://raw.githubusercontent.com/DurancOy/duranc_bootstrap/master/gateway/weights/libdarknet.so
-				wget -O $HOME/.motion/weights/duranc_tiny_v3.weights https://raw.githubusercontent.com/DurancOy/duranc_bootstrap/master/gateway/weights/duranc_tiny_v3.weights
-				wget -O $HOME/.motion/weights/duranc_tiny_v3.names https://raw.githubusercontent.com/DurancOy/duranc_bootstrap/master/gateway/weights/duranc_tiny_v3.names
-				wget -O $HOME/.motion/weights/duranc_tiny_v3.cfg https://raw.githubusercontent.com/DurancOy/duranc_bootstrap/master/gateway/weights/duranc_tiny_v3.cfg
-				# Copy latestweight.txt TO currentweight.txt
-				cp $FILEDIRECTORY/$FILE1 $FILEDIRECTORY/$FILE2
+				# List of files to download
+				FILESLIST=("libdarknet.so" "duranc_tiny_v3.weights" "duranc_tiny_v3.names" "duranc_tiny_v3.cfg")
+				# Base URL for the downloads
+				BASE_URL="$HOSTED_ROOT/gateway/weights"
+				# Flag to check if all files downloaded successfully
+				ALL_DOWNLOADED=true
+				# Download each file with a .new extension
+				for file in "${FILESLIST[@]}"; do
+					wget -O "${FILEDIRECTORY}/${file}.new" "${BASE_URL}/${file}"
+					
+					# Check if the file is non-zero size
+					if [ ! -s "${FILEDIRECTORY}/${file}.new" ]; then
+						echo "Failed to download or file is empty: ${file}"
+						ALL_DOWNLOADED=false
+						break
+					fi
+				done
+				# If all files were downloaded successfully, overwrite the originals
+				if $ALL_DOWNLOADED; then
+					for file in "${FILESFILESLIST[@]}"; do
+						mv "${FILEDIRECTORY}/${file}.new" "${FILEDIRECTORY}/${file}"
+					done
+					cp "${FILEDIRECTORY}/${FILE1}" "${FILEDIRECTORY}/${FILE2}"
+
+					echo "All files were updated successfully!"
+				else
+					echo "Files were not updated due to an error."
+					# Remove any .new files to clean up
+					for file in "${FILESLIST[@]}"; do
+						rm -f "${FILEDIRECTORY}/${file}.new"
+					done
+				fi
+
 			else
 				echo "No change in Files"
 			fi
@@ -166,11 +192,11 @@ then
 			# Fresh Installation, create weights file directory
 			mkdir -p $HOME/.motion/weights
 			echo "You need to download $FILE1"
-			wget -O $HOME/.motion/weights/latestweight.txt https://raw.githubusercontent.com/DurancOy/duranc_bootstrap/master/gateway/weights/latestweight.txt
-			wget -O $HOME/.motion/weights/libdarknet.so https://raw.githubusercontent.com/DurancOy/duranc_bootstrap/master/gateway/weights/libdarknet.so
-			wget -O $HOME/.motion/weights/duranc_tiny_v3.weights https://raw.githubusercontent.com/DurancOy/duranc_bootstrap/master/gateway/weights/duranc_tiny_v3.weights
-			wget -O $HOME/.motion/weights/duranc_tiny_v3.names https://raw.githubusercontent.com/DurancOy/duranc_bootstrap/master/gateway/weights/duranc_tiny_v3.names
-			wget -O $HOME/.motion/weights/duranc_tiny_v3.cfg https://raw.githubusercontent.com/DurancOy/duranc_bootstrap/master/gateway/weights/duranc_tiny_v3.cfg
+			wget -O $HOME/.motion/weights/latestweight.txt $HOSTED_ROOT/gateway/weights/latestweight.txt
+			wget -O $HOME/.motion/weights/libdarknet.so $HOSTED_ROOT/gateway/weights/libdarknet.so
+			wget -O $HOME/.motion/weights/duranc_tiny_v3.weights $HOSTED_ROOT/gateway/weights/duranc_tiny_v3.weights
+			wget -O $HOME/.motion/weights/duranc_tiny_v3.names $HOSTED_ROOT/gateway/weights/duranc_tiny_v3.names
+			wget -O $HOME/.motion/weights/duranc_tiny_v3.cfg $HOSTED_ROOT/gateway/weights/duranc_tiny_v3.cfg
 			# Copy latestweight.txt TO currentweight.txt
 			cp $FILEDIRECTORY/$FILE1 $FILEDIRECTORY/$FILE2
 		fi
@@ -186,7 +212,7 @@ else
 	then
 		echo "Internet UP"
 		mv $HOME/.motion/motion.conf $HOME/.motion/motion-orig.conf
-		wget -O $HOME/.motion/motion.conf https://raw.githubusercontent.com/DurancOy/duranc_bootstrap/master/gateway/motion_pi.conf
+		wget -O $HOME/.motion/motion.conf $HOSTED_ROOT/gateway/motion_pi.conf
 		# CHECK IF MOTION.CONF FILE IS EMPTY OR NOT
 		if [ -s $HOME/.motion/motion.conf ]; then
 			# The file is not-empty.
@@ -353,7 +379,7 @@ sudo chmod 777 -R /.scripts
 SCRIPT=/.scripts/service_ensure_running.sh
 CRON_STRING_TO_CHECK="service_ensure_running"
 CRON_FILE="/var/spool/cron/crontabs/root"
-wget -O $SCRIPT https://raw.githubusercontent.com/DurancOy/duranc_bootstrap/master/gateway/service_ensure_running.sh &> /dev/null
+wget -O $SCRIPT $HOSTED_ROOT/gateway/service_ensure_running.sh &> /dev/null
 sudo chmod 777 -R /.scripts
 if  sudo grep -q "$CRON_STRING_TO_CHECK" "$CRON_FILE" ; then
 	echo 'docker container status entry exists in cron tab' ;
