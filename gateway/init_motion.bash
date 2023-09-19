@@ -249,7 +249,7 @@ then
 	sudo apt purge nodejs -y
 	sudo rm -r /usr/lib/node_modules
 
-	apt-get install -y curl git wget
+	sudo apt-get install -y curl git wget
 
 	curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.32.1/install.sh | bash
 	export NVM_DIR="$HOME/.nvm"
