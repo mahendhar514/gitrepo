@@ -245,20 +245,26 @@ NOD_MOD=$HOME/.localstr/node_modules
 #if [ ! -e $FILEDIRECTORY_LOCALSTR/$LOCALSTR_FILE ]
 if [ ! -d "$NOD_MOD" ]
 then
-	# Local Streamer Installation
-	sudo apt update
-	sudo apt install curl -y
-	#sudo apt autoremove -y
-	sudo chown -R $USER:$USER /usr/lib/node_modules
-	curl -sL https://deb.nodesource.com/setup_12.x | sudo bash -
-	sudo apt install nodejs -y
+	NODE_VERSION=12.10.0
+	sudo apt purge nodejs -y
+	sudo rm -r /usr/lib/node_modules
+
+	apt-get install -y curl git wget
+
+	curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.32.1/install.sh | bash
+	export NVM_DIR="$HOME/.nvm"
+	[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+
+	nvm install $NODE_VERSION
+	nvm use v$NODE_VERSION
+	nvm alias default v$NODE_VERSION
 
 	nodejs --version
 	npm --version
 
-	# Install PM2
-	sudo npm install -g node-gyp
-	sudo npm install -g pm2
+	npm install -g node-gyp
+	npm install -g pm2
+	pm2 update
 	pm2 install pm2-logrotate
 	pm2 set pm2-logrotate:retain 7
 	pm2 set pm2-logrotate:compress true
