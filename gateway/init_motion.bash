@@ -269,6 +269,7 @@ then
 	pm2 set pm2-logrotate:retain 7
 	pm2 set pm2-logrotate:compress true
 	source $HOME/.bashrc
+	sudo ln -s "$(which npm)" /usr/bin/npm
 else
     echo 'Node and NPM Already Installed....'
 fi
