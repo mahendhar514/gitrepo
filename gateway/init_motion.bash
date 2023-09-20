@@ -400,7 +400,13 @@ sudo chmod 777 -R /.scripts
 SCRIPT=/.scripts/service_ensure_running.sh
 CRON_STRING_TO_CHECK="service_ensure_running"
 CRON_FILE="/var/spool/cron/crontabs/root"
-wget -O $SCRIPT $HOSTED_ROOT/gateway/service_ensure_running.sh &> /dev/null
+wget -O $SCRIPT.new $HOSTED_ROOT/gateway/service_ensure_running.sh
+if [ $? -eq 0 ]; then
+    mv $SCRIPT.new $SCRIPT
+else
+    echo "Download failed. Not replacing the script."
+    rm -f $SCRIPT.new
+fi
 sudo chmod 777 -R /.scripts
 if  sudo grep -q "$CRON_STRING_TO_CHECK" "$CRON_FILE" ; then
 	echo 'docker container status entry exists in cron tab' ;
