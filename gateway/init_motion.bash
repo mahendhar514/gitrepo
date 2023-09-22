@@ -138,16 +138,16 @@ then
 
 		##SCRIPT FOR DOWNLOADING LATEST WEIGHT FILES --START ->
 		# Input file
-		FILEDIRECTORY=$HOME/.motion/weights
+		WEIGHTS_DIR=$HOME/.motion/weights
 		FILE1=latestweight.txt
 		FILE2=currentweight.txt
 
-		if [ -e $FILEDIRECTORY/$FILE1 ]
+		if [ -e $WEIGHTS_DIR/$FILE1 ]
 		then
 			echo "File Exists"
-			rm -f $FILEDIRECTORY/$FILE1
+			rm -f $WEIGHTS_DIR/$FILE1
 			wget -O $HOME/.motion/weights/latestweight.txt $HOSTED_ROOT/gateway/weights/latestweight.txt
-			diff --brief <(sort $FILEDIRECTORY/$FILE1) <(sort $FILEDIRECTORY/$FILE2) >/dev/null
+			diff --brief <(sort $WEIGHTS_DIR/$FILE1) <(sort $WEIGHTS_DIR/$FILE2) >/dev/null
 			comp_value=$?
 			#Comparing two files
 			if [ $comp_value -eq 1 ]
@@ -155,15 +155,15 @@ then
 				# List of files to download
 				FILESLIST=("libdarknet.so" "duranc_tiny_v3.weights" "duranc_tiny_v3.names" "duranc_tiny_v3.cfg")
 				# Base URL for the downloads
-				BASE_URL="$HOSTED_ROOT/gateway/weights"
+				WEIGHTS_URL="$HOSTED_ROOT/gateway/weights"
 				# Flag to check if all files downloaded successfully
 				ALL_DOWNLOADED=true
 				# Download each file with a .new extension
 				for file in "${FILESLIST[@]}"; do
-					wget -O "${FILEDIRECTORY}/${file}.new" "${BASE_URL}/${file}"
+					wget -O "${WEIGHTS_DIR}/${file}.new" "${WEIGHTS_URL}/${file}"
 					
 					# Check if the file is non-zero size
-					if [ ! -s "${FILEDIRECTORY}/${file}.new" ]; then
+					if [ ! -s "${WEIGHTS_DIR}/${file}.new" ]; then
 						echo "Failed to download or file is empty: ${file}"
 						ALL_DOWNLOADED=false
 						break
@@ -172,16 +172,16 @@ then
 				# If all files were downloaded successfully, overwrite the originals
 				if $ALL_DOWNLOADED; then
 					for file in "${FILESFILESLIST[@]}"; do
-						mv "${FILEDIRECTORY}/${file}.new" "${FILEDIRECTORY}/${file}"
+						mv "${WEIGHTS_DIR}/${file}.new" "${WEIGHTS_DIR}/${file}"
 					done
-					cp "${FILEDIRECTORY}/${FILE1}" "${FILEDIRECTORY}/${FILE2}"
+					cp "${WEIGHTS_DIR}/${FILE1}" "${WEIGHTS_DIR}/${FILE2}"
 
 					echo "All files were updated successfully!"
 				else
 					echo "Files were not updated due to an error."
 					# Remove any .new files to clean up
 					for file in "${FILESLIST[@]}"; do
-						rm -f "${FILEDIRECTORY}/${file}.new"
+						rm -f "${WEIGHTS_DIR}/${file}.new"
 					done
 				fi
 
@@ -198,7 +198,7 @@ then
 			wget -O $HOME/.motion/weights/duranc_tiny_v3.names $HOSTED_ROOT/gateway/weights/duranc_tiny_v3.names
 			wget -O $HOME/.motion/weights/duranc_tiny_v3.cfg $HOSTED_ROOT/gateway/weights/duranc_tiny_v3.cfg
 			# Copy latestweight.txt TO currentweight.txt
-			cp $FILEDIRECTORY/$FILE1 $FILEDIRECTORY/$FILE2
+			cp $WEIGHTS_DIR/$FILE1 $WEIGHTS_DIR/$FILE2
 		fi
 		##SCRIPT FOR DOWNLOADING LATEST WEIGHT FILES --END <-
 	else
@@ -412,4 +412,47 @@ if  sudo grep -q "$CRON_STRING_TO_CHECK" "$CRON_FILE" ; then
 	echo 'docker container status entry exists in cron tab' ;
 else
 	echo "*/15 * * * * sudo -u $USER $SCRIPT" | sudo tee -a $CRON_FILE >/dev/null
+fi
+
+
+
+
+# Base directory
+WEIGHTS_DIR="$HOME/.motion/weights"
+mkdir -p ${WEIGHTS_DIR}  # Using the correct mkdir command
+
+ONNX_JSON="onnx.json"
+WEIGHTS_URL="$HOSTED_ROOT/gateway/weights"
+
+wget -O "${WEIGHTS_DIR}/${ONNX_JSON}.new" "${WEIGHTS_URL}/${ONNX_JSON}"
+# Compare .new file with the existing one
+if [ $? -eq 0 ] && ! cmp -s "${WEIGHTS_DIR}/${ONNX_JSON}" "${WEIGHTS_DIR}/${ONNX_JSON}.new"; then
+    # List of files to download
+    FILESLIST=("duranc_all_tiny_v7.names" "duranc_all_tiny_v7.onnx")
+    ALL_DOWNLOADED=true
+    # Download each file with a .new extension
+    for file in "${FILESLIST[@]}"; do
+        wget -O "${WEIGHTS_DIR}/${file}.new" "${WEIGHTS_URL}/${file}"
+        # Check if the file is non-zero size
+        if [ ! -s "${WEIGHTS_DIR}/${file}.new" ]; then
+            echo "Failed to download or file is empty: ${file}"
+            ALL_DOWNLOADED=false
+            break
+        fi
+    done
+    # If all files were downloaded successfully, overwrite the originals
+    if $ALL_DOWNLOADED; then
+        for file in "${FILESLIST[@]}"; do
+            mv "${WEIGHTS_DIR}/${file}.new" "${WEIGHTS_DIR}/${file}"
+        done
+        mv "${WEIGHTS_DIR}/${ONNX_JSON}.new" "${WEIGHTS_DIR}/${ONNX_JSON}"  # Using mv instead of cp
+        echo "All files were updated successfully!"
+    else
+        echo "Files were not updated, deleting new files."
+        # Remove any .new files to clean up
+        for file in "${FILESLIST[@]}"; do
+            rm -f "${WEIGHTS_DIR}/${file}.new"
+        done
+        rm -f "${WEIGHTS_DIR}/${ONNX_JSON}.new"  # Clean up the json .new file as well
+    fi
 fi
