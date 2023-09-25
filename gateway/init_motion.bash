@@ -40,6 +40,7 @@ sudo addgroup $USER video
 
 # Upgrade PIP
 pip3 install --upgrade pip
+pip3 install numpy==1.22.0 onnxruntime==1.15.1
 
 # check for sudo permission duplicate entry in sudoers file
 FILE_TO_CHECK_1="/etc/sudoers"
