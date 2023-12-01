@@ -1,7 +1,7 @@
 version: "3"
 services:
   gateway:
-    image: index.docker.io/durancai/staging-gateway-jetson:latest
+    image: index.docker.io/durancai/production-gateway-jetson:latest
     container_name: duranc_gateway
     restart: unless-stopped
     shm_size: "4gb"
