@@ -1,7 +1,7 @@
 version: "3"
 services:
   gateway:
-    image: index.docker.io/durancai/production-gateway-linux:latest
+    image: index.docker.io/durancai/demo-gateway-linux:latest
     container_name: duranc_gateway
     restart: unless-stopped
     volumes:
