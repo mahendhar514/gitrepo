@@ -11,6 +11,7 @@ services:
       - data:/tmp/share
     environment:
         DB_IP: "18.19.0.4"
+        TZ: Asia/Kolkata
     command: mongod
     logging:
       options:
@@ -29,7 +30,7 @@ services:
        - 80:80
        - 83:83
        - 3000:3000
-       - 3004:3004
+       - 3014:3004
        - 3005:3005
     restart: unless-stopped
     command: /bin/bash -c "/tmp/start.sh.x && exec /usr/bin/supervisord"
@@ -40,6 +41,7 @@ services:
     environment:
         PORTAL_URL
         WIKI_ADMIN_EMAIL: img@duranc.com
+        TZ: Asia/Kolkata
     logging:
       options:
         max-size: "10m"
@@ -60,6 +62,9 @@ services:
     restart: unless-stopped
     volumes:
       - messenger_data:/persistent:rw
+      - portal_storage:/local_storage:rw
+    environment:
+        TZ: Asia/Kolkata
     logging:
       options:
         max-size: "10m"
@@ -84,6 +89,8 @@ services:
     restart: unless-stopped
     volumes:
       - streamer_data:/persistent:rw
+    environment:
+        TZ: Asia/Kolkata
     logging:
       options:
         max-size: "10m"
@@ -91,6 +98,33 @@ services:
     networks:
       duranc-network:
         ipv4_address: 18.19.0.7
+
+  archiver:
+    image: index.docker.io/durancai/local-http-archiver:latest
+    container_name: duranc_archiver
+    depends_on:
+      - mongodb
+      - portal
+      - messenger
+      - streamer
+    ports:
+       - 84:84
+       - 3003:3003
+       - 3004:3004
+    restart: unless-stopped
+    #command: /bin/bash -c "/tmp/start.sh.x && exec /usr/bin/supervisord"
+    volumes:
+      - archiver_data:/persistent:rw
+      - portal_storage:/local_storage:rw
+    environment:
+        TZ: Asia/Kolkata
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
+    networks:
+      duranc-network:
+        ipv4_address: 18.19.0.105
 
   recorder:
     image: index.docker.io/durancai/local-http-recorder:latest
@@ -100,11 +134,14 @@ services:
       - portal
       - messenger
       - streamer
+      - archiver
     restart: unless-stopped
     volumes:
       - recorder:/root/.duranc:rw
       - recorder:/persistent:rw
       - motion:/root/.motion:rw
+    environment:
+        TZ: Asia/Kolkata
     network_mode: host
     privileged: true
     # ports:
@@ -126,14 +163,17 @@ services:
       - portal
       - messenger
       - streamer
+      - archiver
       - recorder
     restart: always
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - ~/.docker/auth.json:/config.json:ro
+    environment:
+        TZ: Asia/Kolkata
     ports:
       - 9080:8080
-    command: watchtower duranc_db duranc_portal duranc_messenger duranc_streamer duranc_recorder -i 300 --cleanup --debug
+    command: watchtower duranc_db duranc_portal duranc_messenger duranc_streamer duranc_archiver duranc_recorder -i 300 --cleanup --debug
     logging:
       options:
         max-size: "10m"
@@ -161,6 +201,9 @@ volumes:
   streamer_data:
     external:
       name: http-duranc-streamer
+  archiver_data:
+    external:
+      name: http-duranc-archiver
   recorder:
     external:
       name: http-rec-files
