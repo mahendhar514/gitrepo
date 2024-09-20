@@ -13,8 +13,9 @@ services:
     pid: host
     runtime: nvidia
     environment:
-      - NVIDIA_VISIBLE_DEVICES=all
-      - NVIDIA_DRIVER_CAPABILITIES=all
+      NVIDIA_VISIBLE_DEVICES: all
+      NVIDIA_DRIVER_CAPABILITIES: all
+      TZ: "Asia/Kolkata"
     logging:
       options:
         max-size: "10m"
@@ -29,6 +30,8 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - ~/.docker/auth.json:/config.json:ro
+    environment:
+      TZ: "Asia/Kolkata"
     ports:
       - 9080:8080
     logging:
